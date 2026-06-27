@@ -128,6 +128,10 @@ function parseTrack(reader, trackIndex) {
     if (status < 0x80) {
       reader.offset -= 1;
       if (runningStatus === null) {
+        if (status === 0) {
+          reader.offset += 1;
+          continue;
+        }
         throw new Error(`Дорожка ${trackIndex + 1}: MIDI-событие без running status.`);
       }
       status = runningStatus;
