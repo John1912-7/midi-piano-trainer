@@ -2,6 +2,7 @@ import { PianoEngine } from "./audio/pianoEngine.js";
 import { buildKeyMap, noteName } from "./config/keyMap.js";
 import { TrainerGame } from "./game/trainerGame.js";
 import { InputHandler } from "./game/inputHandler.js";
+import { applyLanguage, detectLanguage, languageUrl, t } from "./i18n.js";
 import { parseMidi } from "./midi/parseMidi.js";
 import { KeyboardView } from "./ui/keyboardView.js";
 
@@ -13,6 +14,7 @@ const elements = {
   track: document.querySelector("#trackSelect"),
   speed: document.querySelector("#speedInput"),
   speedValue: document.querySelector("#speedValue"),
+  language: document.querySelector("#languageSelect"),
   octaveDown: document.querySelector("#octaveDown"),
   octaveUp: document.querySelector("#octaveUp"),
   octaveLabel: document.querySelector("#octaveLabel"),
@@ -26,6 +28,7 @@ const elements = {
   canvas: document.querySelector("#pianoRoll"),
 };
 
+let currentLanguage = applyLanguage(detectLanguage());
 const piano = new PianoEngine();
 const keyboardView = new KeyboardView(elements.keyboard);
 const game = new TrainerGame(elements.canvas, {
@@ -46,6 +49,10 @@ const input = new InputHandler({
 input.bind();
 renderKeyboard();
 
+elements.language.addEventListener("change", () => {
+  window.location.href = languageUrl(elements.language.value);
+});
+
 elements.file.addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
@@ -61,7 +68,7 @@ elements.file.addEventListener("change", async (event) => {
     setReady(true);
     autoFitKeyboard(currentSong.notes);
   } catch (error) {
-    window.alert(error.message || "Не удалось прочитать MIDI-файл.");
+    window.alert(error.message || t(currentLanguage, "readError"));
   }
 });
 
@@ -111,7 +118,12 @@ function autoFitKeyboard(notes) {
 }
 
 function fillTrackSelect(tracks) {
-  elements.track.innerHTML = `<option value="all">Все дорожки</option>`;
+  elements.track.innerHTML = "";
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = t(currentLanguage, "allTracks");
+  elements.track.append(allOption);
+
   for (const track of tracks.filter((item) => item.noteCount > 0)) {
     const option = document.createElement("option");
     option.value = track.index.toString();

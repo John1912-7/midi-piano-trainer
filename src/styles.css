@@ -170,6 +170,21 @@ select {
   margin: 16px 0;
 }
 
+.seo-intro {
+  max-width: 820px;
+  margin: 16px 0;
+}
+
+.seo-intro h2 {
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+
+.seo-intro p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
 .status-strip > div {
   display: grid;
   gap: 4px;

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://john1912-7.github.io/midi-piano-trainer/sitemap.xml

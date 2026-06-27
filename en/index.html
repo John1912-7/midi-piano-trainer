@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <meta name="google-site-verification" content="GOOGLE_SEARCH_CONSOLE_TOKEN_HERE" />
+    <title>MIDI Piano Trainer - piano trainer for MIDI files</title>
+    <meta name="description" content="Free browser MIDI piano trainer: upload a MIDI file, follow falling notes, and play with your PC keyboard." />
+    <link rel="canonical" href="https://john1912-7.github.io/midi-piano-trainer/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/" />
+    <link rel="alternate" hreflang="ru-RU" href="https://john1912-7.github.io/midi-piano-trainer/ru/" />
+    <link rel="alternate" hreflang="hy-AM" href="https://john1912-7.github.io/midi-piano-trainer/hy/" />
+    <link rel="alternate" hreflang="de-DE" href="https://john1912-7.github.io/midi-piano-trainer/de/" />
+    <link rel="alternate" hreflang="es-ES" href="https://john1912-7.github.io/midi-piano-trainer/es/" />
+    <link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="MIDI Piano Trainer" />
+    <meta property="og:description" content="Free browser MIDI piano trainer: upload a MIDI file, follow falling notes, and play with your PC keyboard." />
+    <meta property="og:url" content="https://john1912-7.github.io/midi-piano-trainer/en/" />
+    <meta property="og:site_name" content="MIDI Piano Trainer" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="MIDI Piano Trainer" />
+    <meta name="twitter:description" content="Free browser MIDI piano trainer: upload a MIDI file, follow falling notes, and play with your PC keyboard." />
+    <script>window.GA_MEASUREMENT_ID = "";</script>
+    <script>window.INITIAL_LANGUAGE = "en";</script>
+    <script src="../src/analytics.js" defer></script>
+    <link rel="stylesheet" href="../src/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="toolbar" aria-label="Controls" data-i18n-aria="toolbarLabel">
+        <div class="brand">
+          <span class="brand-mark">M</span>
+          <div>
+            <h1 data-i18n="title">MIDI Piano Trainer</h1>
+            <p data-i18n="subtitle">A personal trainer for playing MIDI on your PC keyboard</p>
+          </div>
+        </div>
+
+        <label class="file-button">
+          <input id="midiFile" type="file" accept=".mid,.midi,audio/midi" />
+          <span data-i18n="upload">Upload MIDI</span>
+        </label>
+
+        <button id="playButton" type="button" disabled data-i18n="play">Play</button>
+        <button id="pauseButton" type="button" disabled data-i18n="pause">Pause</button>
+        <button id="restartButton" type="button" disabled data-i18n="restart">Restart</button>
+
+        <label class="control">
+          <span data-i18n="track">Track</span>
+          <select id="trackSelect" disabled>
+            <option value="all" data-i18n="allTracks">All tracks</option>
+          </select>
+        </label>
+
+        <label class="control speed-control">
+          <span><span data-i18n="speed">Speed</span> <strong id="speedValue">1.00x</strong></span>
+          <input id="speedInput" type="range" min="0.4" max="1.4" step="0.05" value="1" />
+        </label>
+
+        <label class="control language-control">
+          <span data-i18n="language">Language</span>
+          <select id="languageSelect" aria-label="Language">
+            <option value="ru">Русский</option>
+            <option value="hy">Հայերեն</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+
+        <div class="octave-controls" aria-label="Keyboard octave" data-i18n-aria="octaveLabel">
+          <button id="octaveDown" type="button" data-i18n="octaveDown">- octave</button>
+          <strong id="octaveLabel">C3-E5</strong>
+          <button id="octaveUp" type="button" data-i18n="octaveUp">+ octave</button>
+        </div>
+      </section>
+
+      <section class="seo-intro" aria-label="Online piano trainer for MIDI files">
+        <h2 data-i18n="seoHeading">Online piano trainer for MIDI files</h2>
+        <p data-i18n="seoText">Load MIDI directly in the browser, practice parts with your PC keyboard, and track your timing accuracy.</p>
+      </section>
+
+      <section class="status-strip" aria-live="polite">
+        <div><span class="muted" data-i18n="file">File</span><strong id="songName" data-i18n="notLoaded">not loaded</strong></div>
+        <div><span class="muted" data-i18n="notes">Notes</span><strong id="noteCount">0</strong></div>
+        <div><span class="muted" data-i18n="hits">Hits</span><strong id="hitCount">0</strong></div>
+        <div><span class="muted" data-i18n="misses">Misses</span><strong id="missCount">0</strong></div>
+        <div><span class="muted" data-i18n="accuracy">Accuracy</span><strong id="accuracy">0%</strong></div>
+      </section>
+
+      <section class="stage-wrap">
+        <canvas id="pianoRoll" width="1280" height="640"></canvas>
+        <div class="empty-state" id="emptyState">
+          <h2 data-i18n="emptyTitle">Upload a MIDI file</h2>
+          <p data-i18n="emptyText">Notes will appear above and fall toward the hit line.</p>
+        </div>
+      </section>
+
+      <section class="keyboard-panel" aria-label="Piano keyboard" data-i18n-aria="keyboardLabel">
+        <div id="keyboard" class="keyboard"></div>
+      </section>
+    </main>
+
+    <script type="application/ld+json" id="structuredData"></script>
+    <script type="module" src="../src/main.js"></script>
+  </body>
+</html>
