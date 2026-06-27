@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MIDI Piano Trainer</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="toolbar" aria-label="Управление">
+        <div class="brand">
+          <span class="brand-mark">M</span>
+          <div>
+            <h1>MIDI Piano Trainer</h1>
+            <p>Личный тренажер для игры MIDI на клавиатуре ПК</p>
+          </div>
+        </div>
+
+        <label class="file-button">
+          <input id="midiFile" type="file" accept=".mid,.midi,audio/midi" />
+          Загрузить MIDI
+        </label>
+
+        <button id="playButton" type="button" disabled>Play</button>
+        <button id="pauseButton" type="button" disabled>Pause</button>
+        <button id="restartButton" type="button" disabled>Restart</button>
+
+        <label class="control">
+          <span>Дорожка</span>
+          <select id="trackSelect" disabled>
+            <option value="all">Все дорожки</option>
+          </select>
+        </label>
+
+        <label class="control speed-control">
+          <span>Скорость <strong id="speedValue">1.00x</strong></span>
+          <input id="speedInput" type="range" min="0.4" max="1.4" step="0.05" value="1" />
+        </label>
+
+        <div class="octave-controls" aria-label="Октава клавиатуры">
+          <button id="octaveDown" type="button">- октава</button>
+          <strong id="octaveLabel">C3-E5</strong>
+          <button id="octaveUp" type="button">+ октава</button>
+        </div>
+      </section>
+
+      <section class="status-strip" aria-live="polite">
+        <div>
+          <span class="muted">Файл</span>
+          <strong id="songName">не загружен</strong>
+        </div>
+        <div>
+          <span class="muted">Нот</span>
+          <strong id="noteCount">0</strong>
+        </div>
+        <div>
+          <span class="muted">Попадания</span>
+          <strong id="hitCount">0</strong>
+        </div>
+        <div>
+          <span class="muted">Промахи</span>
+          <strong id="missCount">0</strong>
+        </div>
+        <div>
+          <span class="muted">Точность</span>
+          <strong id="accuracy">0%</strong>
+        </div>
+      </section>
+
+      <section class="stage-wrap">
+        <canvas id="pianoRoll" width="1280" height="640"></canvas>
+        <div class="empty-state" id="emptyState">
+          <h2>Загрузи MIDI-файл</h2>
+          <p>Ноты появятся сверху и будут падать к линии нажатия.</p>
+        </div>
+      </section>
+
+      <section class="keyboard-panel" aria-label="Клавиатура пианино">
+        <div id="keyboard" class="keyboard"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
