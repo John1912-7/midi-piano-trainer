@@ -29,3 +29,9 @@ Create a Docker Space and upload the files from this `backend` folder:
 - `Dockerfile`
 
 After deployment, paste the Space URL into the `Audio to MIDI` tab.
+
+## Render
+
+The repository root includes `render.yaml`.
+Create a Render Blueprint/Web Service from the GitHub repository.
+Render will build the Docker backend from `backend/Dockerfile` and check `/health`.
