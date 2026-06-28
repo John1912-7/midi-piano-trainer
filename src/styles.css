@@ -185,6 +185,22 @@ select {
   line-height: 1.5;
 }
 
+.feature-link {
+  margin-top: 8px;
+}
+
+.feature-link a,
+.simple-nav a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.feature-link a:hover,
+.simple-nav a:hover {
+  text-decoration: underline;
+}
+
 .status-strip > div {
   display: grid;
   gap: 4px;
@@ -300,6 +316,72 @@ select {
   opacity: 0.7;
 }
 
+.planning-page {
+  max-width: 1100px;
+}
+
+.simple-nav {
+  margin-bottom: 24px;
+}
+
+.planning-hero {
+  max-width: 860px;
+  margin-bottom: 28px;
+}
+
+.planning-hero .eyebrow {
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.planning-hero h1 {
+  margin-bottom: 12px;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.planning-hero p,
+.planning-grid p,
+.decision-panel p,
+.decision-panel li {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.planning-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.planning-grid article,
+.decision-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--panel);
+}
+
+.planning-grid h2,
+.decision-panel h2 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.decision-panel {
+  margin-top: 14px;
+}
+
+.decision-panel ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
 @media (max-width: 1040px) {
   .toolbar {
     grid-template-columns: 1fr 1fr 1fr;
@@ -317,6 +399,10 @@ select {
   .octave-controls,
   .control {
     justify-content: stretch;
+  }
+
+  .planning-grid {
+    grid-template-columns: 1fr;
   }
 }
 

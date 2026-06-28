@@ -73,6 +73,16 @@ test("warns when the selected notes are wider than the PC keyboard range", async
   await expect(page.locator("#octaveLabel")).toHaveText(/C[34]-E[56]/);
 });
 
+test("opens the audio-to-midi planning page from the Russian home page", async ({ page }) => {
+  await page.goto("/ru/");
+
+  await page.getByRole("link", { name: "Обсудить функцию: аудио или YouTube в MIDI" }).click();
+
+  await expect(page).toHaveURL(/\/ru\/audio-to-midi\/$/);
+  await expect(page.getByRole("heading", { name: "Аудио или YouTube в MIDI" })).toBeVisible();
+  await expect(page.getByText("Да, такую функцию можно сделать.")).toBeVisible();
+});
+
 function createMidiFile(notesOrTracks) {
   const tracks = Array.isArray(notesOrTracks[0])
     ? notesOrTracks.map((notes, index) => ({ name: `Track ${index + 1}`, notes }))
