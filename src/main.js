@@ -30,6 +30,7 @@ const elements = {
 
 const KEYBOARD_MIN_OFFSET = -3;
 const KEYBOARD_MAX_OFFSET = 3;
+const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 
 let currentLanguage = applyLanguage(detectLanguage());
 const piano = new PianoEngine();
@@ -53,6 +54,7 @@ const input = new InputHandler({
 
 input.bind();
 renderKeyboard();
+loadGeneratedMidiFromSession();
 
 elements.language.addEventListener("change", () => {
   window.location.href = languageUrl(elements.language.value);
@@ -64,12 +66,7 @@ elements.file.addEventListener("change", async (event) => {
 
   try {
     const buffer = await file.arrayBuffer();
-    currentSong = parseMidi(buffer);
-    fillTrackSelect(currentSong.tracks);
-    elements.songName.textContent = file.name;
-    elements.emptyState.classList.add("hidden");
-    setReady(true);
-    applySelectedTrack();
+    loadMidiBuffer(buffer, file.name);
   } catch (error) {
     window.alert(error.message || t(currentLanguage, "readError"));
   }
@@ -152,6 +149,33 @@ function applySelectedTrack() {
   }
 
   updateRangeNotice(notes);
+}
+
+function loadMidiBuffer(buffer, name) {
+  currentSong = parseMidi(buffer);
+  fillTrackSelect(currentSong.tracks);
+  elements.songName.textContent = name;
+  elements.emptyState.classList.add("hidden");
+  setReady(true);
+  applySelectedTrack();
+}
+
+function loadGeneratedMidiFromSession() {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("generatedMidi")) return;
+
+  try {
+    const payload = JSON.parse(sessionStorage.getItem(GENERATED_MIDI_KEY) || "null");
+    if (!payload?.bytes) return;
+
+    const bytes = base64ToUint8Array(payload.bytes);
+    loadMidiBuffer(bytes.buffer, payload.name || "converted.mid");
+    sessionStorage.removeItem(GENERATED_MIDI_KEY);
+    window.history.replaceState({}, "", window.location.pathname);
+  } catch (error) {
+    console.error(error);
+    window.alert("Не удалось открыть сгенерированный MIDI. Скачайте файл и загрузите его вручную.");
+  }
 }
 
 function getSelectedNotes() {
@@ -249,4 +273,13 @@ function updateStats(stats) {
   const judged = stats.hits + stats.misses + stats.wrong;
   const accuracy = judged ? Math.round((stats.hits / judged) * 100) : 0;
   elements.accuracy.textContent = `${accuracy}%`;
+}
+
+function base64ToUint8Array(value) {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
 }

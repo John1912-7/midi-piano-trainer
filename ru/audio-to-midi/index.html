@@ -30,11 +30,61 @@
 
       <section class="planning-hero">
         <p class="eyebrow">Новая функция</p>
-        <h1>Аудио или YouTube в MIDI</h1>
+        <h1>Аудио в MIDI</h1>
         <p>
-          Идея: человек загружает аудиофайл или дает ссылку, а сайт получает MIDI-партию,
-          которую потом можно открыть в тренажере с падающими нотами.
+          MVP работает через бесплатный backend: загрузите короткий MP3, WAV, OGG или FLAC,
+          получите MIDI и откройте его в тренажёре с падающими нотами.
         </p>
+      </section>
+
+      <section class="converter-panel" aria-label="Конвертер аудио в MIDI">
+        <div class="converter-copy">
+          <h2>Конвертировать аудио</h2>
+          <p>
+            Лучше всего подходят короткие записи одного инструмента: пианино, гитара, вокальная мелодия.
+            Для MVP файл отправляется на бесплатный backend, который возвращает MIDI.
+          </p>
+        </div>
+
+        <label class="backend-url-control">
+          <span>Backend API URL</span>
+          <input id="backendUrl" type="url" placeholder="https://your-space.hf.space" />
+        </label>
+
+        <div class="converter-controls">
+          <label class="file-button audio-file-button">
+            <input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,audio/*" />
+            <span>Выбрать аудио</span>
+          </label>
+          <button id="convertAudioButton" type="button" disabled>Сделать MIDI</button>
+        </div>
+
+        <div class="conversion-state">
+          <progress id="conversionProgress" max="100" value="0"></progress>
+          <p id="conversionStatus" aria-live="polite">Выберите аудиофайл.</p>
+        </div>
+
+        <div class="conversion-result" id="conversionResult" hidden>
+          <div>
+            <span class="muted">MIDI</span>
+            <strong id="generatedFileName">converted.mid</strong>
+          </div>
+          <div>
+            <span class="muted">Нот найдено</span>
+            <strong id="generatedNoteCount">0</strong>
+          </div>
+          <a class="button-link" id="downloadMidiButton" href="#" download="converted.mid">Скачать MIDI</a>
+          <button id="openTrainerButton" type="button">Открыть в тренажёре</button>
+        </div>
+      </section>
+
+      <section class="youtube-note" aria-label="YouTube">
+        <h2>YouTube-ссылка</h2>
+        <p>
+          YouTube-to-MIDI оставляем следующим этапом. Для бесплатного и безопасного MVP сайт
+          не скачивает YouTube-аудио: пользователь загружает свой аудиофайл, а обработка идёт на backend.
+        </p>
+        <input type="url" placeholder="YouTube-ссылка появится в следующем этапе" disabled />
       </section>
 
       <section class="planning-grid" aria-label="Варианты реализации">
@@ -86,5 +136,6 @@
         </p>
       </section>
     </main>
+    <script src="../../src/audioToMidiApp.js" type="module"></script>
   </body>
 </html>

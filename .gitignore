@@ -3,5 +3,8 @@ Thumbs.db
 node_modules/
 dist/
 .env
+.venv/
+__pycache__/
+*.pyc
 test-results/
 playwright-report/

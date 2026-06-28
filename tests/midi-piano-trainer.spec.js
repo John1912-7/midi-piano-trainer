@@ -74,6 +74,12 @@ test("warns when the selected notes are wider than the PC keyboard range", async
 });
 
 test("opens the audio-to-midi planning page from the Russian home page", async ({ page }) => {
+  const errors = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+
   await page.goto("/ru/");
 
   await expect(page.locator(".site-tabs")).toBeVisible();
@@ -81,8 +87,46 @@ test("opens the audio-to-midi planning page from the Russian home page", async (
 
   await expect(page).toHaveURL(/\/ru\/audio-to-midi\/$/);
   await expect(page.locator(".site-tabs a.active")).toHaveAttribute("href", "./");
-  await expect(page.getByRole("heading", { name: "Аудио или YouTube в MIDI" })).toBeVisible();
-  await expect(page.getByText("Да, такую функцию можно сделать.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Аудио в MIDI" })).toBeVisible();
+  await expect(page.locator("#backendUrl")).toBeAttached();
+  await expect(page.locator("#audioFile")).toBeAttached();
+  await expect(page.locator("#convertAudioButton")).toBeDisabled();
+  await expect(page.locator("#conversionProgress")).toHaveAttribute("value", "0");
+  await expect(page.locator("#conversionStatus")).toContainText("Выберите аудиофайл");
+
+  await page.locator("#backendUrl").fill("http://127.0.0.1:7860");
+  await page.locator("#audioFile").setInputFiles({
+    name: "test-tone.wav",
+    mimeType: "audio/wav",
+    buffer: createWavFile(),
+  });
+
+  await expect(page.locator("#convertAudioButton")).toBeEnabled();
+  await expect(page.locator("#conversionStatus")).toContainText("test-tone.wav");
+  expect(errors).toEqual([]);
+});
+
+test("opens generated MIDI from the audio-to-midi tab in the trainer", async ({ page }) => {
+  await page.goto("/");
+  const midiBytes = [...createMidiFile([60, 64, 67])];
+
+  await page.evaluate((bytes) => {
+    let binary = "";
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    sessionStorage.setItem(
+      "midiPianoTrainerGeneratedMidi",
+      JSON.stringify({
+        name: "generated-test.mid",
+        bytes: btoa(binary),
+      }),
+    );
+  }, midiBytes);
+
+  await page.goto("/ru/?generatedMidi=1");
+
+  await expect(page.locator("#songName")).toHaveText("generated-test.mid");
+  await expect(page.locator("#noteCount")).toHaveText("3");
+  await expect(page.locator("#playButton")).toBeEnabled();
 });
 
 function createMidiFile(notesOrTracks) {
@@ -164,4 +208,33 @@ function varLength(value) {
     }
   }
   return bytes;
+}
+
+function createWavFile() {
+  const sampleRate = 8000;
+  const durationSeconds = 0.2;
+  const sampleCount = Math.floor(sampleRate * durationSeconds);
+  const dataSize = sampleCount * 2;
+  const buffer = Buffer.alloc(44 + dataSize);
+
+  buffer.write("RIFF", 0);
+  buffer.writeUInt32LE(36 + dataSize, 4);
+  buffer.write("WAVE", 8);
+  buffer.write("fmt ", 12);
+  buffer.writeUInt32LE(16, 16);
+  buffer.writeUInt16LE(1, 20);
+  buffer.writeUInt16LE(1, 22);
+  buffer.writeUInt32LE(sampleRate, 24);
+  buffer.writeUInt32LE(sampleRate * 2, 28);
+  buffer.writeUInt16LE(2, 32);
+  buffer.writeUInt16LE(16, 34);
+  buffer.write("data", 36);
+  buffer.writeUInt32LE(dataSize, 40);
+
+  for (let index = 0; index < sampleCount; index += 1) {
+    const sample = Math.round(Math.sin((2 * Math.PI * 440 * index) / sampleRate) * 12000);
+    buffer.writeInt16LE(sample, 44 + index * 2);
+  }
+
+  return buffer;
 }
