@@ -48,20 +48,57 @@ test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ 
   expect(consoleErrors).toEqual([]);
 });
 
-function createMidiFile(notes) {
+test("warns when the selected notes are wider than the PC keyboard range", async ({ page }) => {
+  await page.goto("/");
+
+  await page.locator("#midiFile").setInputFiles({
+    name: "wide-range.mid",
+    mimeType: "audio/midi",
+    buffer: createMidiFile([
+      { name: "Low", notes: [36] },
+      { name: "High", notes: [84] },
+      { name: "Melody", notes: [64, 67] },
+    ]),
+  });
+
+  await expect(page.locator("#songName")).toHaveText("wide-range.mid");
+  await expect(page.locator("#noteCount")).toHaveText("4");
+  await expect(page.locator("#rangeNotice")).toBeVisible();
+  await expect(page.locator("#rangeNotice")).toContainText("C2-C6");
+
+  await page.locator("#trackSelect").selectOption({ label: "Melody (2)" });
+
+  await expect(page.locator("#noteCount")).toHaveText("2");
+  await expect(page.locator("#rangeNotice")).toBeHidden();
+  await expect(page.locator("#octaveLabel")).toHaveText(/C[34]-E[56]/);
+});
+
+function createMidiFile(notesOrTracks) {
+  const tracks = Array.isArray(notesOrTracks[0])
+    ? notesOrTracks.map((notes, index) => ({ name: `Track ${index + 1}`, notes }))
+    : notesOrTracks[0]?.notes
+      ? notesOrTracks
+      : [{ name: "Lane Test", notes: notesOrTracks }];
+
   const header = [
     ...ascii("MThd"),
     ...uint32(6),
-    ...uint16(0),
-    ...uint16(1),
+    ...uint16(tracks.length > 1 ? 1 : 0),
+    ...uint16(tracks.length),
     ...uint16(480),
   ];
+  const trackChunks = tracks.flatMap((track) => createTrackChunk(track.name, track.notes));
+
+  return Buffer.from([...header, ...trackChunks]);
+}
+
+function createTrackChunk(name, notes) {
   const events = [
     0x00,
     0xff,
     0x03,
-    0x09,
-    ...ascii("Lane Test"),
+    name.length,
+    ...ascii(name),
     0x00,
     0xff,
     0x51,
@@ -78,12 +115,11 @@ function createMidiFile(notes) {
 
   events.push(0x00, 0xff, 0x2f, 0x00);
 
-  return Buffer.from([
-    ...header,
+  return [
     ...ascii("MTrk"),
     ...uint32(events.length),
     ...events,
-  ]);
+  ];
 }
 
 function ascii(value) {

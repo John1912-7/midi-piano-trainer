@@ -28,6 +28,9 @@ const elements = {
   canvas: document.querySelector("#pianoRoll"),
 };
 
+const KEYBOARD_MIN_OFFSET = -3;
+const KEYBOARD_MAX_OFFSET = 3;
+
 let currentLanguage = applyLanguage(detectLanguage());
 const piano = new PianoEngine();
 const keyboardView = new KeyboardView(elements.keyboard);
@@ -38,6 +41,8 @@ const game = new TrainerGame(elements.canvas, {
 
 let octaveOffset = 0;
 let currentSong = null;
+let currentKeyMap = [];
+const rangeNotice = createRangeNotice();
 
 const input = new InputHandler({
   piano,
@@ -60,13 +65,11 @@ elements.file.addEventListener("change", async (event) => {
   try {
     const buffer = await file.arrayBuffer();
     currentSong = parseMidi(buffer);
-    game.loadSong(currentSong, elements.track.value);
     fillTrackSelect(currentSong.tracks);
     elements.songName.textContent = file.name;
-    elements.noteCount.textContent = currentSong.notes.length.toString();
     elements.emptyState.classList.add("hidden");
     setReady(true);
-    autoFitKeyboard(currentSong.notes);
+    applySelectedTrack();
   } catch (error) {
     window.alert(error.message || t(currentLanguage, "readError"));
   }
@@ -78,13 +81,7 @@ elements.restart.addEventListener("click", () => game.restart(true));
 
 elements.track.addEventListener("change", () => {
   if (!currentSong) return;
-  game.pause();
-  game.setTrack(elements.track.value);
-  const count =
-    elements.track.value === "all"
-      ? currentSong.notes.length
-      : currentSong.notes.filter((note) => note.trackIndex === Number(elements.track.value)).length;
-  elements.noteCount.textContent = count.toString();
+  applySelectedTrack();
 });
 
 elements.speed.addEventListener("input", () => {
@@ -94,17 +91,20 @@ elements.speed.addEventListener("input", () => {
 });
 
 elements.octaveDown.addEventListener("click", () => {
-  octaveOffset = Math.max(-3, octaveOffset - 1);
+  octaveOffset = Math.max(KEYBOARD_MIN_OFFSET, octaveOffset - 1);
   renderKeyboard();
+  updateRangeNotice(getSelectedNotes());
 });
 
 elements.octaveUp.addEventListener("click", () => {
-  octaveOffset = Math.min(3, octaveOffset + 1);
+  octaveOffset = Math.min(KEYBOARD_MAX_OFFSET, octaveOffset + 1);
   renderKeyboard();
+  updateRangeNotice(getSelectedNotes());
 });
 
 function renderKeyboard() {
   const keyMap = buildKeyMap(octaveOffset);
+  currentKeyMap = keyMap;
   keyboardView.render(keyMap);
   input.setKeyMap(keyMap);
   game.setKeyMap(keyMap);
@@ -113,9 +113,111 @@ function renderKeyboard() {
 
 function autoFitKeyboard(notes) {
   if (!notes.length) return;
-  const medianNote = [...notes].sort((a, b) => a.note - b.note)[Math.floor(notes.length / 2)].note;
-  octaveOffset = Math.max(-3, Math.min(3, Math.round((medianNote - 62) / 12)));
+  const range = getNoteRange(notes);
+  const keyCount = buildKeyMap(0).length;
+
+  let bestOffset = octaveOffset;
+  let bestScore = Infinity;
+
+  for (let offset = KEYBOARD_MIN_OFFSET; offset <= KEYBOARD_MAX_OFFSET; offset += 1) {
+    const keyMap = buildKeyMap(offset);
+    const minPlayable = keyMap[0].note;
+    const maxPlayable = keyMap.at(-1).note;
+    const lowOverflow = Math.max(0, minPlayable - range.min);
+    const highOverflow = Math.max(0, range.max - maxPlayable);
+    const overflow = lowOverflow + highOverflow;
+    const center = (range.min + range.max) / 2;
+    const centerDistance = Math.abs((minPlayable + maxPlayable) / 2 - center) / keyCount;
+    const score = overflow * 100 + centerDistance;
+
+    if (score < bestScore) {
+      bestScore = score;
+      bestOffset = offset;
+    }
+  }
+
+  octaveOffset = bestOffset;
   renderKeyboard();
+}
+
+function applySelectedTrack() {
+  game.pause();
+
+  const notes = getSelectedNotes();
+  elements.noteCount.textContent = notes.length.toString();
+  autoFitKeyboard(notes);
+
+  if (currentSong) {
+    game.loadSong(currentSong, elements.track.value);
+  }
+
+  updateRangeNotice(notes);
+}
+
+function getSelectedNotes() {
+  if (!currentSong) return [];
+  if (elements.track.value === "all") return currentSong.notes;
+  return currentSong.notes.filter((note) => note.trackIndex === Number(elements.track.value));
+}
+
+function getNoteRange(notes) {
+  return notes.reduce(
+    (range, note) => ({
+      min: Math.min(range.min, note.note),
+      max: Math.max(range.max, note.note),
+    }),
+    { min: Infinity, max: -Infinity },
+  );
+}
+
+function updateRangeNotice(notes) {
+  if (!notes.length || !currentKeyMap.length) {
+    rangeNotice.hidden = true;
+    rangeNotice.textContent = "";
+    return;
+  }
+
+  const range = getNoteRange(notes);
+  const playableMin = currentKeyMap[0].note;
+  const playableMax = currentKeyMap.at(-1).note;
+  const outsideCount = notes.filter((note) => note.note < playableMin || note.note > playableMax).length;
+
+  if (outsideCount === 0) {
+    rangeNotice.hidden = true;
+    rangeNotice.textContent = "";
+    return;
+  }
+
+  rangeNotice.hidden = false;
+  rangeNotice.textContent = formatRangeNotice({
+    songMin: noteName(range.min),
+    songMax: noteName(range.max),
+    playableMin: noteName(playableMin),
+    playableMax: noteName(playableMax),
+    outsideCount,
+  });
+}
+
+function formatRangeNotice({ songMin, songMax, playableMin, playableMax, outsideCount }) {
+  const messages = {
+    ru: `Диапазон этой дорожки ${songMin}-${songMax}. Сейчас на клавиатуре ${playableMin}-${playableMax}, поэтому вне доступных клавиш: ${outsideCount} нот. Выбери другую дорожку или сдвинь октаву.`,
+    hy: `Այս հատվածի միջակայքը ${songMin}-${songMax} է։ Այժմ ստեղնաշարի վրա կա ${playableMin}-${playableMax}, ուստի հասանելի ստեղներից դուրս է ${outsideCount} նոտա։ Ընտրիր այլ ճանապարհ կամ փոխիր օկտավան։`,
+    de: `Der Bereich dieser Spur ist ${songMin}-${songMax}. Die Tastatur zeigt ${playableMin}-${playableMax}; ${outsideCount} Noten liegen ausserhalb. Waehle eine andere Spur oder verschiebe die Oktave.`,
+    es: `El rango de esta pista es ${songMin}-${songMax}. El teclado muestra ${playableMin}-${playableMax}; ${outsideCount} notas quedan fuera. Elige otra pista o cambia la octava.`,
+    en: `This track spans ${songMin}-${songMax}. The keyboard currently covers ${playableMin}-${playableMax}, so ${outsideCount} notes are outside the playable keys. Choose another track or shift the octave.`,
+  };
+
+  return messages[currentLanguage] || messages.en;
+}
+
+function createRangeNotice() {
+  const notice = document.createElement("section");
+  notice.id = "rangeNotice";
+  notice.className = "range-notice";
+  notice.hidden = true;
+  notice.setAttribute("aria-live", "polite");
+  document.querySelector(".status-strip").after(notice);
+  return notice;
 }
 
 function fillTrackSelect(tracks) {
