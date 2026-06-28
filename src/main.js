@@ -107,6 +107,7 @@ function renderKeyboard() {
   const keyMap = buildKeyMap(octaveOffset);
   keyboardView.render(keyMap);
   input.setKeyMap(keyMap);
+  game.setKeyMap(keyMap);
   elements.octaveLabel.textContent = `${noteName(keyMap[0].note)}-${noteName(keyMap.at(-1).note)}`;
 }
 

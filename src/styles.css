@@ -240,11 +240,12 @@ select {
 }
 
 .keyboard {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(var(--key-count, 29), minmax(38px, 1fr));
   min-width: 900px;
   height: 128px;
-  padding: 12px;
-  gap: 4px;
+  padding: 0;
+  gap: 0;
 }
 
 .key {
@@ -252,18 +253,16 @@ select {
   display: grid;
   align-content: end;
   justify-items: center;
-  min-width: 46px;
-  border-radius: 0 0 8px 8px;
-  padding: 8px 4px;
+  min-width: 0;
+  border-radius: 0;
+  padding: 8px 2px;
   color: #101114;
   background: #edf2f4;
   border: 1px solid #d2d8dd;
 }
 
 .key.black {
-  min-width: 34px;
   height: 78px;
-  margin: 0 -19px 0 -19px;
   z-index: 2;
   color: #f4f7f8;
   background: #17191d;

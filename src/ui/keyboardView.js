@@ -9,6 +9,7 @@ export class KeyboardView {
   render(keyMap) {
     this.root.innerHTML = "";
     this.elements.clear();
+    this.root.style.setProperty("--key-count", keyMap.length.toString());
 
     for (const key of keyMap) {
       const element = document.createElement("button");

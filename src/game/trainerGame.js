@@ -15,10 +15,18 @@ export class TrainerGame {
     this.startedAt = 0;
     this.isPlaying = false;
     this.animationId = null;
+    this.keyMap = [];
+    this.noteToLane = new Map();
     this.stats = { hits: 0, misses: 0, perfect: 0, good: 0, wrong: 0 };
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.canvas.parentElement);
     this.resize();
+  }
+
+  setKeyMap(keyMap) {
+    this.keyMap = [...keyMap];
+    this.noteToLane = new Map(this.keyMap.map((key, index) => [key.note, index]));
+    this.draw();
   }
 
   loadSong(song, trackIndex = "all") {
@@ -174,16 +182,18 @@ export class TrainerGame {
 
     const currentTime = this.getPosition();
     const hitY = height - 92;
-    const range = this.getVisibleRange();
-    const laneWidth = width / (range.max - range.min + 1);
+    const laneWidth = this.getLaneWidth(width);
 
     for (const note of this.notes) {
+      const lane = this.noteToLane.get(note.note);
+      if (lane === undefined) continue;
+
       const y = hitY - (note.start - currentTime) * PIXELS_PER_SECOND;
       const noteHeight = Math.max(10, note.duration * PIXELS_PER_SECOND);
       if (y < -noteHeight || y > height + 80) continue;
       if (note.start < currentTime - 1 || note.start > currentTime + LOOKAHEAD_SECONDS) continue;
 
-      const x = (note.note - range.min) * laneWidth;
+      const x = lane * laneWidth;
       this.drawNote(ctx, note, x, y - noteHeight, Math.max(4, laneWidth - 2), noteHeight);
     }
 
@@ -191,26 +201,31 @@ export class TrainerGame {
     this.drawTime(ctx, width, currentTime);
   }
 
-  getVisibleRange() {
-    const visible = this.notes.filter((note) => {
-      const currentTime = this.getPosition();
-      return note.start > currentTime - 2 && note.start < currentTime + LOOKAHEAD_SECONDS;
-    });
-    const source = visible.length ? visible : this.notes;
-    const min = Math.max(21, Math.min(...source.map((note) => note.note)) - 2);
-    const max = Math.min(108, Math.max(...source.map((note) => note.note)) + 2);
-    return { min, max };
+  getLaneWidth(width) {
+    return width / Math.max(1, this.keyMap.length || 29);
   }
 
   drawBackground(ctx, width, height) {
     ctx.fillStyle = "#0d0f12";
     ctx.fillRect(0, 0, width, height);
 
-    const range = this.notes.length ? this.getVisibleRange() : { min: 48, max: 76 };
-    const laneWidth = width / (range.max - range.min + 1);
-    for (let note = range.min; note <= range.max; note += 1) {
-      ctx.fillStyle = BLACK_CLASSES.has(note % 12) ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.018)";
-      ctx.fillRect((note - range.min) * laneWidth, 0, laneWidth, height);
+    const lanes = this.keyMap.length
+      ? this.keyMap
+      : Array.from({ length: 29 }, (_, index) => ({ note: 48 + index }));
+    const laneWidth = this.getLaneWidth(width);
+
+    for (let index = 0; index < lanes.length; index += 1) {
+      const note = lanes[index].note;
+      const x = index * laneWidth;
+      ctx.fillStyle = BLACK_CLASSES.has(note % 12) ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.018)";
+      ctx.fillRect(x, 0, laneWidth, height);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.075)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + 0.5, 0);
+      ctx.lineTo(x + 0.5, height);
+      ctx.stroke();
     }
   }
 
