@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="IKltP1oUj7Y3BJdkTE2-DUNCvV29QHhHrTNKxxtqPhs" />
-    <title>Аудио в MIDI - план функции для MIDI Piano Trainer</title>
-    <meta name="description" content="План функции для MIDI Piano Trainer: как можно превращать аудио, MP3 или ссылку YouTube в MIDI для тренировки на клавиатуре ПК." />
+    <title>Аудио в MIDI - конвертер для MIDI Piano Trainer</title>
+    <meta name="description" content="Конвертер аудио в MIDI для MIDI Piano Trainer: загрузите MP3, WAV, OGG или FLAC, получите MIDI и откройте его в тренажере пианино." />
     <link rel="canonical" href="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
-    <meta property="og:title" content="Аудио в MIDI - план функции" />
-    <meta property="og:description" content="Обсуждение возможной функции: загрузить аудио или ссылку и получить MIDI для тренажера пианино." />
+    <meta property="og:title" content="Аудио в MIDI - конвертер" />
+    <meta property="og:description" content="Загрузите аудио и получите MIDI для тренажера пианино." />
     <meta property="og:url" content="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
     <meta property="og:site_name" content="MIDI Piano Trainer" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Аудио в MIDI - план функции" />
-    <meta name="twitter:description" content="Как можно сделать конвертацию аудио в MIDI для тренажера пианино." />
+    <meta name="twitter:title" content="Аудио в MIDI - конвертер" />
+    <meta name="twitter:description" content="Конвертация аудио в MIDI для тренажера пианино." />
     <script>window.GA_MEASUREMENT_ID = "G-VLFBK0YZ88";</script>
     <script src="../../src/analytics.js" defer></script>
     <link rel="stylesheet" href="../../src/styles.css" />
@@ -48,7 +48,7 @@
 
         <label class="backend-url-control">
           <span>Backend API URL</span>
-          <input id="backendUrl" type="url" placeholder="https://your-space.hf.space" />
+          <input id="backendUrl" type="url" placeholder="https://midi-piano-trainer-backend.onrender.com" />
         </label>
 
         <div class="converter-controls">
@@ -56,6 +56,7 @@
             <input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,audio/*" />
             <span>Выбрать аудио</span>
           </label>
+          <button id="checkBackendButton" type="button" disabled>Проверить backend</button>
           <button id="convertAudioButton" type="button" disabled>Сделать MIDI</button>
         </div>
 
@@ -117,12 +118,12 @@
       </section>
 
       <section class="decision-panel" aria-label="Рекомендованный план">
-        <h2>Рекомендованный MVP</h2>
+        <h2>Что уже делает MVP</h2>
         <ol>
-          <li>Сначала сделать загрузку MP3/WAV/OGG с компьютера.</li>
-          <li>Показать статус: файл принят, идет распознавание, MIDI готов.</li>
-          <li>После распознавания автоматически открыть MIDI в текущем тренажере.</li>
-          <li>Позже добавить backend с AI-моделью и очередь обработки файлов.</li>
+          <li>Принимает MP3/WAV/OGG/FLAC с компьютера.</li>
+          <li>Отправляет файл на backend с AI-моделью Basic Pitch.</li>
+          <li>Показывает статус: файл принят, идет распознавание, MIDI готов.</li>
+          <li>Позволяет скачать MIDI или открыть его в текущем тренажере.</li>
           <li>YouTube-ссылки оставить как отдельный вопрос после проверки правил и архитектуры.</li>
         </ol>
       </section>
@@ -131,7 +132,7 @@
         <h2>Вывод</h2>
         <p>
           Да, такую функцию можно сделать. Но правильный путь для нашего сайта:
-          сначала загрузка аудиофайла, потом серверная AI-конвертация в MIDI.
+          загрузка аудиофайла, потом серверная AI-конвертация в MIDI.
           Прямой YouTube-to-MIDI на статическом GitHub Pages делать не стоит.
         </p>
       </section>

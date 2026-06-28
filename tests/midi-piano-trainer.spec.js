@@ -73,7 +73,7 @@ test("warns when the selected notes are wider than the PC keyboard range", async
   await expect(page.locator("#octaveLabel")).toHaveText(/C[34]-E[56]/);
 });
 
-test("opens the audio-to-midi planning page from the Russian home page", async ({ page }) => {
+test("opens the audio-to-midi page and checks backend health", async ({ page }) => {
   const errors = [];
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
@@ -90,11 +90,24 @@ test("opens the audio-to-midi planning page from the Russian home page", async (
   await expect(page.getByRole("heading", { name: "Аудио в MIDI" })).toBeVisible();
   await expect(page.locator("#backendUrl")).toBeAttached();
   await expect(page.locator("#audioFile")).toBeAttached();
+  await expect(page.locator("#checkBackendButton")).toBeDisabled();
   await expect(page.locator("#convertAudioButton")).toBeDisabled();
   await expect(page.locator("#conversionProgress")).toHaveAttribute("value", "0");
   await expect(page.locator("#conversionStatus")).toContainText("Выберите аудиофайл");
 
+  await page.route("http://127.0.0.1:7860/health", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ ok: true }),
+    });
+  });
+
   await page.locator("#backendUrl").fill("http://127.0.0.1:7860");
+  await expect(page.locator("#checkBackendButton")).toBeEnabled();
+  await page.locator("#checkBackendButton").click();
+  await expect(page.locator("#conversionStatus")).toContainText("Backend доступен");
+
   await page.locator("#audioFile").setInputFiles({
     name: "test-tone.wav",
     mimeType: "audio/wav",

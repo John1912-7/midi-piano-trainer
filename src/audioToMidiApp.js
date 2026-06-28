@@ -5,6 +5,7 @@ const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
 const elements = {
   backendUrl: document.querySelector("#backendUrl"),
   file: document.querySelector("#audioFile"),
+  checkBackend: document.querySelector("#checkBackendButton"),
   convert: document.querySelector("#convertAudioButton"),
   download: document.querySelector("#downloadMidiButton"),
   openTrainer: document.querySelector("#openTrainerButton"),
@@ -20,10 +21,33 @@ let generatedMidiBytes = null;
 let generatedMidiName = "converted.mid";
 
 elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || "";
+updateConvertState();
 
 elements.backendUrl.addEventListener("input", () => {
   localStorage.setItem(BACKEND_URL_KEY, elements.backendUrl.value.trim());
   updateConvertState();
+});
+
+elements.checkBackend.addEventListener("click", async () => {
+  const backendUrl = normalizeBackendUrl(elements.backendUrl.value);
+  if (!backendUrl) {
+    setStatus("Укажите URL backend API.");
+    return;
+  }
+
+  try {
+    setBusy(true, "Проверяю...", "Сделать MIDI");
+    setProgress(15);
+    await checkBackendHealth(backendUrl);
+    setProgress(100);
+    setStatus("Backend доступен. Можно конвертировать аудио.");
+  } catch (error) {
+    console.error(error);
+    setProgress(0);
+    setStatus(error.message || "Backend не отвечает.");
+  } finally {
+    setBusy(false);
+  }
 });
 
 elements.file.addEventListener("change", () => {
@@ -111,6 +135,7 @@ function updateConvertState() {
   const hasBackend = Boolean(normalizeBackendUrl(elements.backendUrl.value));
   const hasValidFile = selectedFile && selectedFile.size <= MAX_AUDIO_MB * 1024 * 1024;
   elements.convert.disabled = !hasBackend || !hasValidFile;
+  elements.checkBackend.disabled = !hasBackend;
 }
 
 function showResult(noteCount) {
@@ -122,11 +147,13 @@ function showResult(noteCount) {
   elements.result.hidden = false;
 }
 
-function setBusy(isBusy) {
+function setBusy(isBusy, checkLabel = "Проверить backend", convertLabel = "Конвертация...") {
   elements.backendUrl.disabled = isBusy;
   elements.file.disabled = isBusy;
+  elements.checkBackend.disabled = isBusy || !normalizeBackendUrl(elements.backendUrl.value);
   elements.convert.disabled = isBusy || !selectedFile;
-  elements.convert.textContent = isBusy ? "Конвертация..." : "Сделать MIDI";
+  elements.checkBackend.textContent = isBusy ? checkLabel : "Проверить backend";
+  elements.convert.textContent = isBusy ? convertLabel : "Сделать MIDI";
 }
 
 function setStatus(message) {
@@ -143,6 +170,29 @@ function normalizeBackendUrl(value) {
 
 function cleanFileName(name) {
   return name.replace(/\.[^.]+$/, "").replace(/[^\wа-яА-ЯёЁ.-]+/g, "-").replace(/-+/g, "-") || "converted";
+}
+
+async function checkBackendHealth(backendUrl) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch(`${backendUrl}/health`, {
+      method: "GET",
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Backend вернул ошибку ${response.status}.`);
+    }
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("Backend долго не отвечает. Проверьте URL или подождите, пока бесплатный сервер проснется.");
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
 }
 
 async function readErrorMessage(response) {
