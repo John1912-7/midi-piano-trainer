@@ -201,6 +201,36 @@ select {
   text-decoration: underline;
 }
 
+.site-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.site-tabs a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  padding: 0 16px;
+  color: var(--muted);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.site-tabs a:hover {
+  color: #f4f7f8;
+}
+
+.site-tabs a.active {
+  border-color: var(--line);
+  background: var(--panel);
+  color: var(--accent);
+}
+
 .status-strip > div {
   display: grid;
   gap: 4px;

@@ -76,9 +76,11 @@ test("warns when the selected notes are wider than the PC keyboard range", async
 test("opens the audio-to-midi planning page from the Russian home page", async ({ page }) => {
   await page.goto("/ru/");
 
-  await page.getByRole("link", { name: "Обсудить функцию: аудио или YouTube в MIDI" }).click();
+  await expect(page.locator(".site-tabs")).toBeVisible();
+  await page.locator('.site-tabs a[href="./audio-to-midi/"]').click();
 
   await expect(page).toHaveURL(/\/ru\/audio-to-midi\/$/);
+  await expect(page.locator(".site-tabs a.active")).toHaveAttribute("href", "./");
   await expect(page.getByRole("heading", { name: "Аудио или YouTube в MIDI" })).toBeVisible();
   await expect(page.getByText("Да, такую функцию можно сделать.")).toBeVisible();
 });
