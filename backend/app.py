@@ -2,7 +2,6 @@ import os
 import tempfile
 from pathlib import Path
 
-from basic_pitch.inference import predict
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
@@ -64,6 +63,8 @@ async def convert(file: UploadFile = File(...)):
                 output.write(chunk)
 
         try:
+            from basic_pitch.inference import predict
+
             _, midi_data, note_events = predict(str(input_path))
             midi_data.write(str(output_path))
         except Exception as error:
