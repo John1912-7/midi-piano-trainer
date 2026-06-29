@@ -1,5 +1,5 @@
 (function () {
-  var measurementId = window.GA_MEASUREMENT_ID;
+  var measurementId = window.GA_MEASUREMENT_ID || "G-EFDCRJY776";
   if (!measurementId) return;
 
   var script = document.createElement("script");
