@@ -6,9 +6,12 @@ import { applyLanguage, detectLanguage, languageUrl, t } from "./i18n.js";
 import { parseMidi } from "./midi/parseMidi.js";
 import { KeyboardView } from "./ui/keyboardView.js";
 
+ensureListenButtonElement();
+
 const elements = {
   file: document.querySelector("#midiFile"),
   play: document.querySelector("#playButton"),
+  listen: document.querySelector("#listenButton"),
   pause: document.querySelector("#pauseButton"),
   restart: document.querySelector("#restartButton"),
   track: document.querySelector("#trackSelect"),
@@ -38,6 +41,8 @@ const keyboardView = new KeyboardView(elements.keyboard);
 const game = new TrainerGame(elements.canvas, {
   piano,
   onStatsChange: updateStats,
+  onAutoNoteChange: (note, isActive) => keyboardView.setNoteActive(note, isActive),
+  onPlaybackChange: updatePlaybackControls,
 });
 
 let octaveOffset = 0;
@@ -74,6 +79,7 @@ elements.file.addEventListener("change", async (event) => {
 });
 
 elements.play.addEventListener("click", () => game.play());
+elements.listen.addEventListener("click", () => game.listen());
 elements.pause.addEventListener("click", () => game.pause());
 elements.restart.addEventListener("click", () => game.restart(true));
 
@@ -299,8 +305,30 @@ function fillTrackSelect(tracks) {
 
 function setReady(isReady) {
   elements.play.disabled = !isReady;
+  elements.listen.disabled = !isReady;
   elements.pause.disabled = !isReady;
   elements.restart.disabled = !isReady;
+}
+
+function updatePlaybackControls({ isPlaying, mode }) {
+  elements.listen.textContent = isPlaying && mode === "listen"
+    ? t(currentLanguage, "stopListen")
+    : t(currentLanguage, "listen");
+}
+
+function ensureListenButtonElement() {
+  if (document.querySelector("#listenButton")) return;
+
+  const playButton = document.querySelector("#playButton");
+  if (!playButton) return;
+
+  const listenButton = document.createElement("button");
+  listenButton.id = "listenButton";
+  listenButton.type = "button";
+  listenButton.disabled = true;
+  listenButton.dataset.i18n = "listen";
+  listenButton.textContent = "Listen";
+  playButton.after(listenButton);
 }
 
 function updateStats(stats) {

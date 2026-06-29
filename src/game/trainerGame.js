@@ -2,11 +2,13 @@ import { GOOD_WINDOW, HIT_WINDOW, LOOKAHEAD_SECONDS, PIXELS_PER_SECOND } from ".
 import { BLACK_CLASSES, noteName } from "../config/keyMap.js";
 
 export class TrainerGame {
-  constructor(canvas, { piano, onStatsChange }) {
+  constructor(canvas, { piano, onStatsChange, onAutoNoteChange = () => {}, onPlaybackChange = () => {} }) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.piano = piano;
     this.onStatsChange = onStatsChange;
+    this.onAutoNoteChange = onAutoNoteChange;
+    this.onPlaybackChange = onPlaybackChange;
     this.allNotes = [];
     this.notes = [];
     this.duration = 0;
@@ -14,9 +16,12 @@ export class TrainerGame {
     this.position = 0;
     this.startedAt = 0;
     this.isPlaying = false;
+    this.mode = "practice";
     this.animationId = null;
     this.keyMap = [];
     this.noteToLane = new Map();
+    this.autoStarted = new Set();
+    this.autoActive = new Map();
     this.stats = { hits: 0, misses: 0, perfect: 0, good: 0, wrong: 0 };
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(this.canvas.parentElement);
@@ -62,9 +67,30 @@ export class TrainerGame {
 
   async play() {
     if (!this.notes.length || this.isPlaying) return;
+    this.mode = "practice";
     await this.piano.resume();
     this.startedAt = performance.now() / 1000 - this.position / this.speed;
     this.isPlaying = true;
+    this.emitPlaybackChange();
+    this.loop();
+  }
+
+  async listen() {
+    if (!this.notes.length) return;
+    if (this.isPlaying && this.mode === "listen") {
+      this.pause();
+      return;
+    }
+
+    if (this.isPlaying) this.pause();
+    if (this.position >= this.duration) this.position = 0;
+
+    this.mode = "listen";
+    this.resetAutoPlayback();
+    await this.piano.resume();
+    this.startedAt = performance.now() / 1000 - this.position / this.speed;
+    this.isPlaying = true;
+    this.emitPlaybackChange();
     this.loop();
   }
 
@@ -72,15 +98,17 @@ export class TrainerGame {
     if (!this.isPlaying) return;
     this.position = this.getPosition();
     this.isPlaying = false;
-    this.piano.stopAll();
+    this.stopAutoPlayback();
     cancelAnimationFrame(this.animationId);
     this.draw();
+    this.emitPlaybackChange();
   }
 
   restart(autoplay = true) {
     this.position = 0;
     this.isPlaying = false;
-    this.piano.stopAll();
+    this.mode = "practice";
+    this.stopAutoPlayback();
     this.notes.forEach((note) => {
       note.status = "pending";
       note.judgedAt = null;
@@ -88,6 +116,7 @@ export class TrainerGame {
     this.resetStats();
     cancelAnimationFrame(this.animationId);
     this.draw();
+    this.emitPlaybackChange();
     if (autoplay) this.play();
   }
 
@@ -135,12 +164,17 @@ export class TrainerGame {
 
   loop() {
     this.position = this.getPosition();
-    this.updateMisses();
+    if (this.mode === "listen") {
+      this.updateAutoPlayback();
+    } else {
+      this.updateMisses();
+    }
     this.draw();
 
     if (this.position >= this.duration + 0.8) {
       this.isPlaying = false;
-      this.piano.stopAll();
+      this.stopAutoPlayback();
+      this.emitPlaybackChange();
       return;
     }
 
@@ -161,6 +195,47 @@ export class TrainerGame {
     }
 
     if (changed) this.emitStats();
+  }
+
+  updateAutoPlayback() {
+    const currentTime = this.getPosition();
+
+    for (const note of this.notes) {
+      const noteEnd = note.start + note.duration;
+
+      if (!this.autoStarted.has(note.id) && note.start <= currentTime && noteEnd >= currentTime) {
+        this.autoStarted.add(note.id);
+        this.autoActive.set(note.id, note);
+        this.piano.noteOn(note.note, note.velocity || 0.75);
+        this.onAutoNoteChange(note.note, true);
+      }
+    }
+
+    for (const [id, note] of this.autoActive) {
+      if (note.start + note.duration <= currentTime) {
+        this.piano.noteOff(note.note);
+        this.onAutoNoteChange(note.note, false);
+        this.autoActive.delete(id);
+      }
+    }
+  }
+
+  resetAutoPlayback() {
+    this.stopAutoPlayback();
+    this.autoStarted.clear();
+  }
+
+  stopAutoPlayback() {
+    for (const note of this.autoActive.values()) {
+      this.piano.noteOff(note.note);
+      this.onAutoNoteChange(note.note, false);
+    }
+    this.autoActive.clear();
+    this.piano.stopAll();
+  }
+
+  emitPlaybackChange() {
+    this.onPlaybackChange({ isPlaying: this.isPlaying, mode: this.mode });
   }
 
   resize() {

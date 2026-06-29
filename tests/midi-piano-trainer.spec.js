@@ -19,6 +19,7 @@ test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ 
   await expect(page.locator("#songName")).toHaveText("lane-test.mid");
   await expect(page.locator("#noteCount")).toHaveText("2");
   await expect(page.locator("#playButton")).toBeEnabled();
+  await expect(page.locator("#listenButton")).toBeEnabled();
   await expect(page.locator("#emptyState")).toHaveClass(/hidden/);
 
   const alignment = await page.evaluate(() => {
@@ -46,6 +47,69 @@ test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ 
   expect(Math.abs(alignment.a3LaneCenter - alignment.a3KeyCenter)).toBeLessThan(2);
   expect(Math.abs(alignment.e4LaneCenter - alignment.e4KeyCenter)).toBeLessThan(2);
   expect(consoleErrors).toEqual([]);
+});
+
+test("listens to the selected MIDI file through the piano engine", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__midiStartedOscillators = 0;
+
+    class FakeAudioNode {
+      constructor() {
+        this.gain = {
+          value: 0.45,
+          setValueAtTime() {},
+          exponentialRampToValueAtTime() {},
+          cancelScheduledValues() {},
+        };
+        this.frequency = { value: 0 };
+      }
+
+      connect() {}
+
+      start() {
+        window.__midiStartedOscillators += 1;
+      }
+
+      stop() {}
+    }
+
+    class FakeAudioContext {
+      constructor() {
+        this.currentTime = 0;
+        this.destination = {};
+        this.state = "running";
+      }
+
+      createGain() {
+        return new FakeAudioNode();
+      }
+
+      createOscillator() {
+        return new FakeAudioNode();
+      }
+
+      resume() {
+        this.state = "running";
+        return Promise.resolve();
+      }
+    }
+
+    window.AudioContext = FakeAudioContext;
+  });
+
+  await page.goto("/");
+  await page.locator("#midiFile").setInputFiles({
+    name: "listen-test.mid",
+    mimeType: "audio/midi",
+    buffer: createMidiFile([60]),
+  });
+
+  await expect(page.locator("#listenButton")).toBeEnabled();
+  await page.locator("#listenButton").click();
+  await expect(page.locator("#listenButton")).toHaveText("Stop");
+  await expect
+    .poll(() => page.evaluate(() => window.__midiStartedOscillators))
+    .toBeGreaterThan(0);
 });
 
 test("warns when the selected notes are wider than the PC keyboard range", async ({ page }) => {
@@ -163,6 +227,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   await expect(page.locator("#songName")).toHaveText("test-tone.mid");
   await expect(page.locator("#noteCount")).toHaveText("3");
   await expect(page.locator("#playButton")).toBeEnabled();
+  await expect(page.locator("#listenButton")).toBeEnabled();
 });
 
 test("opens generated MIDI from the audio-to-midi tab in the trainer", async ({ page }) => {
@@ -186,6 +251,7 @@ test("opens generated MIDI from the audio-to-midi tab in the trainer", async ({ 
   await expect(page.locator("#songName")).toHaveText("generated-test.mid");
   await expect(page.locator("#noteCount")).toHaveText("3");
   await expect(page.locator("#playButton")).toBeEnabled();
+  await expect(page.locator("#listenButton")).toBeEnabled();
 });
 
 function createMidiFile(notesOrTracks) {
