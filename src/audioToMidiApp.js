@@ -1,6 +1,7 @@
 const MAX_AUDIO_MB = 25;
 const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
+const DEFAULT_BACKEND_URL = "https://vanya1912-midi-piano-trainer-backend.hf.space";
 
 const copy = {
   ru: {
@@ -136,7 +137,7 @@ let generatedMidiBytes = null;
 let generatedMidiName = "converted.mid";
 let resultUrl = "";
 
-elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || "";
+elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || DEFAULT_BACKEND_URL;
 if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB`;
 if (elements.languageSelect) elements.languageSelect.value = language;
 setStatus(text.chooseFile);

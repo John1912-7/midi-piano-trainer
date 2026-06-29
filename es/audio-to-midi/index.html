@@ -35,7 +35,7 @@
       <section class="planning-hero audio-hero"><p class="eyebrow">Herramienta open-source experimental</p><h1>Conversor gratuito de audio a MIDI</h1><p>Sube tu propio MP3, WAV, OGG, FLAC o M4A, envialo a un backend compatible y abre el MIDI en el entrenador de piano.</p></section>
       <section class="converter-panel" aria-label="Conversor de audio a MIDI">
         <div class="converter-copy"><h2>Convertir audio</h2><p>Funcionan mejor las grabaciones cortas y limpias de un solo instrumento. El archivo se envia solo a la URL backend que indiques. Limite MVP: <strong id="audioLimitLabel">25 MB</strong>.</p></div>
-        <label class="backend-url-control"><span>Backend API URL</span><input id="backendUrl" type="url" placeholder="http://127.0.0.1:7860" autocomplete="url" /></label>
+        <label class="backend-url-control"><span>Backend API URL</span><input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" /></label>
         <div class="selected-file-card" aria-label="Archivo seleccionado"><span class="muted">Archivo</span><strong id="selectedFileName">-</strong><small id="selectedFileMeta">25 MB max</small></div>
         <div class="converter-controls"><label class="file-button audio-file-button"><input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" /><span>Elegir audio</span></label><button id="checkBackendButton" type="button" disabled>Comprobar backend</button><button id="convertAudioButton" type="button" disabled>Crear MIDI</button></div>
         <div class="conversion-state"><progress id="conversionProgress" max="100" value="0"></progress><p id="conversionStatus" aria-live="polite">Elige un archivo de audio.</p></div>

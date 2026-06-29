@@ -1,12 +1,10 @@
 import os
-import shutil
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 
-SPACE_ID = os.getenv("HF_SPACE_ID", "John1912-7/midi-piano-trainer-backend")
+SPACE_NAME = os.getenv("HF_SPACE_NAME", "midi-piano-trainer-backend")
+SPACE_ID = os.getenv("HF_SPACE_ID")
 ROOT = Path(__file__).resolve().parents[1]
 BACKEND = ROOT / "backend"
 
@@ -20,11 +18,13 @@ def main() -> int:
 
     token = os.getenv("HF_TOKEN")
     api = HfApi(token=token)
+    namespace = SPACE_ID.split("/", 1)[0] if SPACE_ID else api.whoami()["name"]
+    space_id = SPACE_ID or f"{namespace}/{SPACE_NAME}"
 
-    print(f"Creating or reusing Hugging Face Space: {SPACE_ID}")
+    print(f"Creating or reusing Hugging Face Space: {space_id}")
     try:
         api.create_repo(
-            repo_id=SPACE_ID,
+            repo_id=space_id,
             repo_type="space",
             space_sdk="docker",
             private=False,
@@ -38,32 +38,17 @@ def main() -> int:
         print(f"Original error: {error}")
         return 1
 
-    with tempfile.TemporaryDirectory(prefix="midi-hf-space-") as temp_dir:
-        temp_path = Path(temp_dir)
-        remote = f"https://huggingface.co/spaces/{SPACE_ID}"
-        run(["git", "clone", remote, str(temp_path)])
+    api.upload_folder(
+        repo_id=space_id,
+        repo_type="space",
+        folder_path=str(BACKEND),
+        path_in_repo=".",
+        allow_patterns=["app.py", "requirements.txt", "Dockerfile", "README.md"],
+        commit_message="Deploy MIDI Piano Trainer backend",
+    )
 
-        for name in ["app.py", "requirements.txt", "Dockerfile", "README.md"]:
-            shutil.copy2(BACKEND / name, temp_path / name)
-
-        run(["git", "add", "app.py", "requirements.txt", "Dockerfile", "README.md"], cwd=temp_path)
-        if has_changes(temp_path):
-            run(["git", "commit", "-m", "Deploy MIDI Piano Trainer backend"], cwd=temp_path)
-            run(["git", "push"], cwd=temp_path)
-        else:
-            print("Space files are already up to date.")
-
-    print(f"Backend URL: https://{SPACE_ID.replace('/', '-')}.hf.space")
+    print(f"Backend URL: https://{space_id.replace('/', '-')}.hf.space")
     return 0
-
-
-def has_changes(cwd: Path) -> bool:
-    result = subprocess.run(["git", "status", "--short"], cwd=cwd, text=True, capture_output=True, check=True)
-    return bool(result.stdout.strip())
-
-
-def run(command: list[str], cwd: Path | None = None) -> None:
-    subprocess.run(command, cwd=cwd, check=True)
 
 
 if __name__ == "__main__":

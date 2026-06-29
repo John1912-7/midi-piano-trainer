@@ -52,6 +52,12 @@ Audio to MIDI pages:
 
 The optional backend lives in `backend/`.
 
+Live MVP backend:
+
+```text
+https://vanya1912-midi-piano-trainer-backend.hf.space
+```
+
 Endpoints:
 
 - `GET /health`

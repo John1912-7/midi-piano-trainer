@@ -45,7 +45,7 @@
       </section>
       <section class="converter-panel" aria-label="Audio zu MIDI Konverter">
         <div class="converter-copy"><h2>Audio konvertieren</h2><p>Kurze, saubere Aufnahmen eines einzelnen Instruments funktionieren am besten. Die Datei geht nur an die Backend-URL, die du eingibst. MVP-Limit: <strong id="audioLimitLabel">25 MB</strong>.</p></div>
-        <label class="backend-url-control"><span>Backend API URL</span><input id="backendUrl" type="url" placeholder="http://127.0.0.1:7860" autocomplete="url" /></label>
+        <label class="backend-url-control"><span>Backend API URL</span><input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" /></label>
         <div class="selected-file-card" aria-label="Ausgewaehlte Datei"><span class="muted">Datei</span><strong id="selectedFileName">-</strong><small id="selectedFileMeta">25 MB max</small></div>
         <div class="converter-controls"><label class="file-button audio-file-button"><input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" /><span>Audio waehlen</span></label><button id="checkBackendButton" type="button" disabled>Backend pruefen</button><button id="convertAudioButton" type="button" disabled>MIDI erstellen</button></div>
         <div class="conversion-state"><progress id="conversionProgress" max="100" value="0"></progress><p id="conversionStatus" aria-live="polite">Waehle eine Audiodatei.</p></div>

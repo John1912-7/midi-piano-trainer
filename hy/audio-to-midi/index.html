@@ -35,7 +35,7 @@
       <section class="planning-hero audio-hero"><p class="eyebrow">Փորձնական open-source գործիք</p><h1>Աուդիոից MIDI անվճար փոխարկիչ</h1><p>Բեռնեք ձեր սեփական MP3, WAV, OGG, FLAC կամ M4A ֆայլը, ուղարկեք համատեղելի backend և բացեք MIDI-ն դաշնամուրի վարժարանում:</p></section>
       <section class="converter-panel" aria-label="Աուդիոից MIDI փոխարկիչ">
         <div class="converter-copy"><h2>Փոխարկել աուդիոն</h2><p>Լավագույն արդյունքը տալիս են կարճ և մաքուր մեկ գործիքի ձայնագրությունները։ Ֆայլը ուղարկվում է միայն ձեր նշած backend URL-ին։ MVP սահմանափակում՝ <strong id="audioLimitLabel">25 MB</strong>։</p></div>
-        <label class="backend-url-control"><span>Backend API URL</span><input id="backendUrl" type="url" placeholder="http://127.0.0.1:7860" autocomplete="url" /></label>
+        <label class="backend-url-control"><span>Backend API URL</span><input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" /></label>
         <div class="selected-file-card" aria-label="Ընտրված ֆայլ"><span class="muted">Ֆայլ</span><strong id="selectedFileName">-</strong><small id="selectedFileMeta">25 MB max</small></div>
         <div class="converter-controls"><label class="file-button audio-file-button"><input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" /><span>Ընտրել աուդիո</span></label><button id="checkBackendButton" type="button" disabled>Ստուգել backend-ը</button><button id="convertAudioButton" type="button" disabled>Ստեղծել MIDI</button></div>
         <div class="conversion-state"><progress id="conversionProgress" max="100" value="0"></progress><p id="conversionStatus" aria-live="polite">Ընտրեք աուդիո ֆայլ:</p></div>
