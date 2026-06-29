@@ -55,6 +55,7 @@ const input = new InputHandler({
 input.bind();
 renderKeyboard();
 loadGeneratedMidiFromSession();
+ensureToolNav();
 
 elements.language.addEventListener("change", () => {
   window.location.href = languageUrl(elements.language.value);
@@ -224,8 +225,8 @@ function updateRangeNotice(notes) {
 
 function formatRangeNotice({ songMin, songMax, playableMin, playableMax, outsideCount }) {
   const messages = {
-    ru: `Диапазон этой дорожки ${songMin}-${songMax}. Сейчас на клавиатуре ${playableMin}-${playableMax}, поэтому вне доступных клавиш: ${outsideCount} нот. Выбери другую дорожку или сдвинь октаву.`,
-    hy: `Այս հատվածի միջակայքը ${songMin}-${songMax} է։ Այժմ ստեղնաշարի վրա կա ${playableMin}-${playableMax}, ուստի հասանելի ստեղներից դուրս է ${outsideCount} նոտա։ Ընտրիր այլ ճանապարհ կամ փոխիր օկտավան։`,
+    ru: `Диапазон этой дорожки ${songMin}-${songMax}. Сейчас клавиатура покрывает ${playableMin}-${playableMax}, поэтому вне доступных клавиш: ${outsideCount} нот. Выберите другую дорожку или сдвиньте октаву.`,
+    hy: `Այս տրեկի միջակայքը ${songMin}-${songMax} է։ Ստեղնաշարը հիմա ընդգրկում է ${playableMin}-${playableMax}, ուստի ${outsideCount} նոտա դուրս է հասանելի ստեղներից։ Ընտրեք այլ տրեկ կամ փոխեք օկտավան։`,
     de: `Der Bereich dieser Spur ist ${songMin}-${songMax}. Die Tastatur zeigt ${playableMin}-${playableMax}; ${outsideCount} Noten liegen ausserhalb. Waehle eine andere Spur oder verschiebe die Oktave.`,
     es: `El rango de esta pista es ${songMin}-${songMax}. El teclado muestra ${playableMin}-${playableMax}; ${outsideCount} notas quedan fuera. Elige otra pista o cambia la octava.`,
     en: `This track spans ${songMin}-${songMax}. The keyboard currently covers ${playableMin}-${playableMax}, so ${outsideCount} notes are outside the playable keys. Choose another track or shift the octave.`,
@@ -242,6 +243,41 @@ function createRangeNotice() {
   notice.setAttribute("aria-live", "polite");
   document.querySelector(".status-strip").after(notice);
   return notice;
+}
+
+function ensureToolNav() {
+  const existingNav = document.querySelector(".site-tabs");
+  const nav = existingNav || document.createElement("nav");
+
+  if (!existingNav) {
+    nav.className = "site-tabs";
+    nav.setAttribute("aria-label", "Site sections");
+    document.querySelector(".toolbar").after(nav);
+  }
+
+  ensureNavLink(nav, "trainer", "./", t(currentLanguage, "trainerTab"), true);
+  ensureNavLink(nav, "audio", "./audio-to-midi/", t(currentLanguage, "audioTab"), false);
+  ensureNavLink(nav, "hub", "https://john1912-7.github.io/open-free-tools/", t(currentLanguage, "hubTab"), false);
+}
+
+function ensureNavLink(nav, key, href, text, isActive) {
+  let link = nav.querySelector(`[data-nav-link="${key}"]`);
+  if (!link) link = nav.querySelector(`a[href="${href}"]`);
+  if (!link && key === "hub") link = nav.querySelector('a[href="https://john1912-7.github.io/open-free-tools/"]');
+  if (!link) {
+    link = document.createElement("a");
+    nav.append(link);
+  }
+
+  link.dataset.navLink = key;
+  link.href = href;
+  link.textContent = text;
+  link.classList.toggle("active", isActive);
+  if (isActive) {
+    link.setAttribute("aria-current", "page");
+  } else {
+    link.removeAttribute("aria-current");
+  }
 }
 
 function fillTrackSelect(tracks) {

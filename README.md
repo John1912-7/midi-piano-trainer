@@ -1,41 +1,77 @@
 # MIDI Piano Trainer
 
-Браузерный тренажер пианино: загружаете `.mid` файл, видите падающие ноты и играете их на клавиатуре ПК.
+Free browser-first piano practice tool for MIDI files, plus an experimental Audio to MIDI converter.
 
-Сайт: https://john1912-7.github.io/midi-piano-trainer/
+Site: https://john1912-7.github.io/midi-piano-trainer/
 
-## Что уже есть
+Part of the Open Free Tools ecosystem: https://john1912-7.github.io/open-free-tools/
 
-- Загрузка MIDI прямо в браузере.
-- Парсинг MIDI-файлов формата 0/1 с tempo events.
-- Падающие ноты, привязанные к клавишам и столбцам.
-- Оценка попаданий: hit/miss/wrong.
-- Звук через Web Audio API.
-- Выбор дорожки MIDI.
-- Автоматическое расширение диапазона октав под песню.
-- SEO-страницы на русском, английском, немецком, испанском и армянском.
-- Вкладка Audio to MIDI с подключаемым backend URL.
+Before major changes, read `PROJECT_PLAN_FOR_CODEX.md`.
 
-## Аналитика и Search Console
+## What Works
 
-- MIDI Piano Trainer использует Google Analytics ID: `G-EFDCRJY776`.
-- Dog Training Academy использует отдельный ID: `G-8R0RKRNPSK`.
-- Не используйте старый ID `G-VLFBK0YZ88` для новых страниц MIDI-проекта.
-- Search Console property для этого проекта: `https://john1912-7.github.io/midi-piano-trainer/`.
-- Sitemap: `https://john1912-7.github.io/midi-piano-trainer/sitemap.xml`.
+- Upload `.mid` / `.midi` files directly in the browser.
+- Parse MIDI format 0/1 files with tempo events.
+- Show falling notes aligned with the PC keyboard lanes.
+- Select MIDI tracks.
+- Auto-fit the playable keyboard octave range.
+- Track hits, misses, and accuracy.
+- Play notes through the Web Audio API.
+- Open generated MIDI from the Audio to MIDI page.
+- SEO pages for English, Russian, German, Spanish, and Armenian.
+- Google Analytics and Search Console verification tags.
 
-Для новых страниц внутри этого проекта подключайте общий `src/analytics.js`. Если на странице не задан `window.GA_MEASUREMENT_ID`, скрипт использует MIDI ID по умолчанию.
+## Audio to MIDI MVP
 
-## Локальный запуск сайта
+Audio to MIDI is a working MVP page, not a built-in GitHub Pages backend.
+
+Supported user flow:
+
+1. User uploads their own MP3, WAV, OGG, FLAC, or M4A file.
+2. User enters a compatible backend API URL.
+3. The page sends the audio file to `POST /convert`.
+4. The backend returns a `.mid` file.
+5. The user downloads the MIDI or opens it in MIDI Piano Trainer.
+
+Rules:
+
+- Do not download YouTube audio directly.
+- Do not make the backend required for the normal MIDI trainer.
+- Keep the file limit visible. Current MVP limit: 25 MB.
+- Keep the backend URL user-configurable.
+
+Audio to MIDI pages:
+
+- https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/
+- https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/
+- https://john1912-7.github.io/midi-piano-trainer/de/audio-to-midi/
+- https://john1912-7.github.io/midi-piano-trainer/es/audio-to-midi/
+- https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/
+
+## Backend API
+
+The optional backend lives in `backend/`.
+
+Endpoints:
+
+- `GET /health`
+- `POST /convert` with `multipart/form-data` field `file`
+
+Expected response headers:
+
+- `X-Midi-Filename`
+- `X-Note-Count`
+
+## Local Site
 
 ```bash
 npm install
-npm run dev
+npm test
 ```
 
-Потом откройте адрес, который покажет Vite.
+The Playwright test command starts a local static server automatically.
 
-## Локальный запуск backend
+## Local Backend
 
 ```bash
 cd backend
@@ -43,24 +79,37 @@ docker build -t midi-piano-backend .
 docker run --rm -p 7860:7860 midi-piano-backend
 ```
 
-Backend URL для вкладки Audio to MIDI:
+Then use this backend URL on the Audio to MIDI page:
 
 ```text
 http://127.0.0.1:7860
 ```
 
-## Деплой backend
+## Deployment Notes
 
-В репозитории есть `render.yaml`. На Render можно создать Blueprint/Web Service из GitHub-репозитория, и он возьмет Docker-конфигурацию из папки `backend`.
+The repository includes `render.yaml` for a Render free-plan backend experiment.
 
-После деплоя нужно вставить URL backend в поле на странице:
+Free backend hosting can sleep, throttle, or run out of memory. Keep this optional and explain delays in the UI.
 
-```text
-/ru/audio-to-midi/
-```
+## Analytics and SEO
 
-## Тесты
+- Google Analytics ID: `G-EFDCRJY776`
+- Search Console property: `https://john1912-7.github.io/midi-piano-trainer/`
+- Sitemap: `https://john1912-7.github.io/midi-piano-trainer/sitemap.xml`
 
-```bash
-npm test
-```
+Every public page should keep:
+
+- unique title;
+- unique meta description;
+- one clear h1;
+- canonical URL;
+- language-only hreflang links;
+- useful text content;
+- mobile-friendly layout.
+
+## Project Rules
+
+- Core functionality stays free and open-source.
+- Ads must not be placed near upload, play, convert, editor, or download controls.
+- Do not copy paid services' logos, UI, text, private APIs, gated content, or protected behavior.
+- Keep Open Transcription Studio as a separate future tool, not inside this MIDI codebase.

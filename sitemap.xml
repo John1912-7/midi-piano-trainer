@@ -3,29 +3,80 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://john1912-7.github.io/midi-piano-trainer/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/" />
-    <xhtml:link rel="alternate" hreflang="ru-RU" href="https://john1912-7.github.io/midi-piano-trainer/ru/" />
-    <xhtml:link rel="alternate" hreflang="hy-AM" href="https://john1912-7.github.io/midi-piano-trainer/hy/" />
-    <xhtml:link rel="alternate" hreflang="de-DE" href="https://john1912-7.github.io/midi-piano-trainer/de/" />
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://john1912-7.github.io/midi-piano-trainer/es/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://john1912-7.github.io/midi-piano-trainer/ru/" />
+    <xhtml:link rel="alternate" hreflang="hy" href="https://john1912-7.github.io/midi-piano-trainer/hy/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://john1912-7.github.io/midi-piano-trainer/de/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://john1912-7.github.io/midi-piano-trainer/es/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/" />
   </url>
   <url>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/en/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
     <loc>https://john1912-7.github.io/midi-piano-trainer/ru/</loc>
-  </url>
-  <url>
-    <loc>https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/</loc>
-  </url>
-  <url>
-    <loc>https://john1912-7.github.io/midi-piano-trainer/hy/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://john1912-7.github.io/midi-piano-trainer/de/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://john1912-7.github.io/midi-piano-trainer/es/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://john1912-7.github.io/midi-piano-trainer/en/</loc>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/hy/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://john1912-7.github.io/midi-piano-trainer/de/audio-to-midi/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://john1912-7.github.io/midi-piano-trainer/es/audio-to-midi/" />
+    <xhtml:link rel="alternate" hreflang="hy" href="https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/" />
+  </url>
+  <url>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/de/audio-to-midi/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/es/audio-to-midi/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

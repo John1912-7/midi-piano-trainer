@@ -5,35 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="IKltP1oUj7Y3BJdkTE2-DUNCvV29QHhHrTNKxxtqPhs" />
-    <title>Аудио в MIDI - конвертер для MIDI Piano Trainer</title>
-    <meta name="description" content="Конвертер аудио в MIDI для MIDI Piano Trainer: загрузите MP3, WAV, OGG или FLAC, получите MIDI и откройте его в тренажере пианино." />
+    <title>Бесплатный конвертер аудио в MIDI онлайн | MIDI Piano Trainer</title>
+    <meta name="description" content="Загрузите MP3, WAV, OGG, FLAC или M4A, получите MIDI через optional backend и откройте результат в бесплатном MIDI Piano Trainer." />
     <link rel="canonical" href="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
+    <link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
+    <link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
+    <link rel="alternate" hreflang="ru" href="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
+    <link rel="alternate" hreflang="de" href="https://john1912-7.github.io/midi-piano-trainer/de/audio-to-midi/" />
+    <link rel="alternate" hreflang="es" href="https://john1912-7.github.io/midi-piano-trainer/es/audio-to-midi/" />
+    <link rel="alternate" hreflang="hy" href="https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ru_RU" />
-    <meta property="og:title" content="Аудио в MIDI - конвертер" />
-    <meta property="og:description" content="Загрузите аудио и получите MIDI для тренажера пианино." />
+    <meta property="og:title" content="Бесплатный конвертер аудио в MIDI" />
+    <meta property="og:description" content="Конвертируйте свой аудиофайл в MIDI и сразу открывайте его в тренажере пианино." />
     <meta property="og:url" content="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
     <meta property="og:site_name" content="MIDI Piano Trainer" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Аудио в MIDI - конвертер" />
-    <meta name="twitter:description" content="Конвертация аудио в MIDI для тренажера пианино." />
+    <meta name="twitter:title" content="Бесплатный конвертер аудио в MIDI" />
+    <meta name="twitter:description" content="Загрузите свое аудио, получите MIDI и тренируйтесь по падающим нотам." />
     <script>window.GA_MEASUREMENT_ID = "G-EFDCRJY776";</script>
     <script src="../../src/analytics.js" defer></script>
     <link rel="stylesheet" href="../../src/styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Audio to MIDI Converter",
+        "applicationCategory": "MusicApplication",
+        "operatingSystem": "Web",
+        "url": "https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/",
+        "description": "Бесплатный браузерный интерфейс для конвертации пользовательских аудиофайлов в MIDI через optional backend.",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
   </head>
   <body>
     <main class="app planning-page">
       <nav class="site-tabs" aria-label="Разделы сайта">
-        <a href="../">Тренажёр</a>
+        <a href="../">Тренажер</a>
         <a class="active" href="./" aria-current="page">Аудио в MIDI</a>
+        <a href="https://john1912-7.github.io/open-free-tools/">Open Free Tools</a>
       </nav>
 
-      <section class="planning-hero">
-        <p class="eyebrow">Новая функция</p>
-        <h1>Аудио в MIDI</h1>
+      <div class="audio-topbar">
+        <label class="control language-control">
+          <span>Язык</span>
+          <select id="audioLanguageSelect" aria-label="Language">
+            <option value="ru">Русский</option>
+            <option value="hy">Հայերեն</option>
+            <option value="de">Deutsch</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+      </div>
+
+      <section class="planning-hero audio-hero">
+        <p class="eyebrow">Экспериментальный open-source инструмент</p>
+        <h1>Бесплатный конвертер аудио в MIDI</h1>
         <p>
-          MVP работает через бесплатный backend: загрузите короткий MP3, WAV, OGG или FLAC,
-          получите MIDI и откройте его в тренажёре с падающими нотами.
+          Загрузите собственный MP3, WAV, OGG, FLAC или M4A, отправьте его на совместимый backend,
+          скачайте MIDI или сразу откройте результат в тренажере пианино.
         </p>
       </section>
 
@@ -41,19 +74,25 @@
         <div class="converter-copy">
           <h2>Конвертировать аудио</h2>
           <p>
-            Лучше всего подходят короткие записи одного инструмента: пианино, гитара, вокальная мелодия.
-            Для MVP файл отправляется на бесплатный backend, который возвращает MIDI.
+            Лучше всего подходят короткие чистые записи одного инструмента. Файл отправляется только
+            на backend URL, который вы сами укажете. Лимит MVP: <strong id="audioLimitLabel">25 MB</strong>.
           </p>
         </div>
 
         <label class="backend-url-control">
           <span>Backend API URL</span>
-          <input id="backendUrl" type="url" placeholder="https://midi-piano-trainer-backend.onrender.com" />
+          <input id="backendUrl" type="url" placeholder="http://127.0.0.1:7860" autocomplete="url" />
         </label>
+
+        <div class="selected-file-card" aria-label="Выбранный файл">
+          <span class="muted">Файл</span>
+          <strong id="selectedFileName">-</strong>
+          <small id="selectedFileMeta">25 MB max</small>
+        </div>
 
         <div class="converter-controls">
           <label class="file-button audio-file-button">
-            <input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,audio/*" />
+            <input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" />
             <span>Выбрать аудио</span>
           </label>
           <button id="checkBackendButton" type="button" disabled>Проверить backend</button>
@@ -75,66 +114,29 @@
             <strong id="generatedNoteCount">0</strong>
           </div>
           <a class="button-link" id="downloadMidiButton" href="#" download="converted.mid">Скачать MIDI</a>
-          <button id="openTrainerButton" type="button">Открыть в тренажёре</button>
+          <button id="openTrainerButton" type="button">Открыть в тренажере</button>
         </div>
       </section>
 
-      <section class="youtube-note" aria-label="YouTube">
-        <h2>YouTube-ссылка</h2>
-        <p>
-          YouTube-to-MIDI оставляем следующим этапом. Для бесплатного и безопасного MVP сайт
-          не скачивает YouTube-аудио: пользователь загружает свой аудиофайл, а обработка идёт на backend.
-        </p>
-        <input type="url" placeholder="YouTube-ссылка появится в следующем этапе" disabled />
-      </section>
-
-      <section class="planning-grid" aria-label="Варианты реализации">
+      <section class="planning-grid" aria-label="Как работает инструмент">
         <article>
-          <h2>Что можно сделать на GitHub Pages</h2>
-          <p>
-            Можно добавить страницу, загрузку аудиофайла, интерфейс настроек и простую
-            обработку прямо в браузере. Это подойдет для экспериментов с короткими файлами,
-            но качество распознавания будет ограниченным.
-          </p>
+          <h2>1. Укажите backend</h2>
+          <p>Backend остается optional: тренажер MIDI работает без него, а конвертация аудио использует ваш API URL.</p>
         </article>
-
         <article>
-          <h2>Что требует backend</h2>
-          <p>
-            Нормальная конвертация песни в MIDI требует тяжелой модели распознавания нот.
-            Для этого нужен сервер: он принимает файл, запускает AI-модель, сохраняет результат
-            и возвращает MIDI в тренажер.
-          </p>
+          <h2>2. Загрузите свой файл</h2>
+          <p>Сайт не скачивает YouTube и не обходит платные сервисы. Пользователь загружает только свой аудиофайл.</p>
         </article>
-
         <article>
-          <h2>Почему YouTube сложнее</h2>
-          <p>
-            Официальный YouTube API не является инструментом для скачивания аудио из видео.
-            Поэтому надежный и юридически аккуратный вариант - не скачивать YouTube напрямую,
-            а просить пользователя загрузить свой аудиофайл.
-          </p>
+          <h2>3. Откройте MIDI</h2>
+          <p>После конвертации можно скачать `.mid` или открыть его в MIDI Piano Trainer для практики.</p>
         </article>
       </section>
 
-      <section class="decision-panel" aria-label="Рекомендованный план">
-        <h2>Что уже делает MVP</h2>
-        <ol>
-          <li>Принимает MP3/WAV/OGG/FLAC с компьютера.</li>
-          <li>Отправляет файл на backend с AI-моделью Basic Pitch.</li>
-          <li>Показывает статус: файл принят, идет распознавание, MIDI готов.</li>
-          <li>Позволяет скачать MIDI или открыть его в текущем тренажере.</li>
-          <li>YouTube-ссылки оставить как отдельный вопрос после проверки правил и архитектуры.</li>
-        </ol>
-      </section>
-
-      <section class="decision-panel" aria-label="Решение">
-        <h2>Вывод</h2>
-        <p>
-          Да, такую функцию можно сделать. Но правильный путь для нашего сайта:
-          загрузка аудиофайла, потом серверная AI-конвертация в MIDI.
-          Прямой YouTube-to-MIDI на статическом GitHub Pages делать не стоит.
-        </p>
+      <section class="decision-panel">
+        <h2>FAQ</h2>
+        <p><strong>Почему нужен backend?</strong> Распознавание нот тяжелее обычной статической страницы, поэтому GitHub Pages сам не может выполнить AI-конвертацию.</p>
+        <p><strong>Какие файлы лучше?</strong> Короткие записи пианино, гитары или отдельной мелодии дают лучший результат, чем полный микс песни.</p>
       </section>
     </main>
     <script src="../../src/audioToMidiApp.js" type="module"></script>

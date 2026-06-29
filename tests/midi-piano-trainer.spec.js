@@ -87,7 +87,7 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
 
   await expect(page).toHaveURL(/\/ru\/audio-to-midi\/$/);
   await expect(page.locator(".site-tabs a.active")).toHaveAttribute("href", "./");
-  await expect(page.getByRole("heading", { name: "Аудио в MIDI" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Бесплатный конвертер аудио в MIDI" })).toBeVisible();
   await expect(page.locator("#backendUrl")).toBeAttached();
   await expect(page.locator("#audioFile")).toBeAttached();
   await expect(page.locator("#checkBackendButton")).toBeDisabled();
@@ -117,6 +117,52 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
   await expect(page.locator("#convertAudioButton")).toBeEnabled();
   await expect(page.locator("#conversionStatus")).toContainText("test-tone.wav");
   expect(errors).toEqual([]);
+});
+
+test("converts audio through backend and opens the generated MIDI in the trainer", async ({ page }) => {
+  const midi = createMidiFile([60, 64, 67]);
+
+  await page.route("http://127.0.0.1:7860/health", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ ok: true }),
+    });
+  });
+
+  await page.route("http://127.0.0.1:7860/convert", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "audio/midi",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Expose-Headers": "X-Midi-Filename, X-Note-Count",
+        "X-Midi-Filename": "test-tone.mid",
+        "X-Note-Count": "3",
+      },
+      body: midi,
+    });
+  });
+
+  await page.goto("/ru/audio-to-midi/");
+  await page.locator("#backendUrl").fill("http://127.0.0.1:7860");
+  await page.locator("#audioFile").setInputFiles({
+    name: "test-tone.wav",
+    mimeType: "audio/wav",
+    buffer: createWavFile(),
+  });
+
+  await page.locator("#convertAudioButton").click();
+  await expect(page.locator("#conversionStatus")).toContainText("MIDI готов");
+  await expect(page.locator("#generatedFileName")).toHaveText("test-tone.mid");
+  await expect(page.locator("#generatedNoteCount")).toHaveText("3");
+  await expect(page.locator("#downloadMidiButton")).toHaveAttribute("download", "test-tone.mid");
+
+  await page.locator("#openTrainerButton").click();
+  await expect(page).toHaveURL(/\/ru\/$/);
+  await expect(page.locator("#songName")).toHaveText("test-tone.mid");
+  await expect(page.locator("#noteCount")).toHaveText("3");
+  await expect(page.locator("#playButton")).toBeEnabled();
 });
 
 test("opens generated MIDI from the audio-to-midi tab in the trainer", async ({ page }) => {

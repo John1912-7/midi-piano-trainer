@@ -41,6 +41,9 @@ export const translations = {
     toolbarLabel: "Управление",
     octaveLabel: "Октава клавиатуры",
     keyboardLabel: "Клавиатура пианино",
+    trainerTab: "Тренажер",
+    audioTab: "Аудио в MIDI",
+    hubTab: "Open Free Tools",
     readError: "Не удалось прочитать MIDI-файл.",
   },
   hy: {
@@ -48,33 +51,36 @@ export const translations = {
     locale: "hy_AM",
     pageTitle: "MIDI Piano Trainer - MIDI դաշնամուրի վարժարան",
     description:
-      "Բրաուզերային MIDI դաշնամուրի վարժարան. ներբեռնեք MIDI ֆայլը, տեսեք ընկնող նոտաները և նվագեք համակարգչի ստեղնաշարով:",
+      "Անվճար բրաուզերային MIDI դաշնամուրի վարժարան. ներբեռնեք MIDI ֆայլ, հետևեք ընկնող նոտաներին և նվագեք համակարգչի ստեղնաշարով:",
     title: "MIDI Piano Trainer",
-    subtitle: "Անձնական MIDI վարժարան համակարգչի ստեղնաշարով նվագելու համար",
+    subtitle: "Անձնական վարժարան MIDI նվագելու համար համակարգչի ստեղնաշարով",
     seoHeading: "Առցանց դաշնամուրի վարժարան MIDI ֆայլերի համար",
     seoText:
-      "Ներբեռնեք MIDI-ը անմիջապես բրաուզերում, վարժեք պարտիաները համակարգչի ստեղնաշարով և հետևեք ճշգրտությանը:",
-    upload: "Ներբեռնել MIDI",
+      "Բեռնեք MIDI-ն անմիջապես բրաուզերում, վարժեք պարտիաները համակարգչի ստեղնաշարով և հետևեք ճշգրտությանը:",
+    upload: "Բեռնել MIDI",
     play: "Play",
     pause: "Pause",
     restart: "Restart",
     track: "Տրեկ",
-    allTracks: "Բոլոր տրեկերը",
+    allTracks: "Բոլոր տրեկները",
     speed: "Արագություն",
     language: "Լեզու",
     octaveDown: "- օկտավա",
     octaveUp: "+ օկտավա",
     file: "Ֆայլ",
-    notLoaded: "չի ներբեռնվել",
+    notLoaded: "չի բեռնվել",
     notes: "Նոտաներ",
     hits: "Ճիշտ սեղմումներ",
     misses: "Բաց թողած",
     accuracy: "Ճշգրտություն",
-    emptyTitle: "Ներբեռնեք MIDI ֆայլ",
-    emptyText: "Նոտաները կհայտնվեն վերևից և կընկնեն սեղմման գծի ուղղությամբ:",
+    emptyTitle: "Բեռնեք MIDI ֆայլ",
+    emptyText: "Նոտաները կհայտնվեն վերևում և կիջնեն դեպի սեղմման գիծը:",
     toolbarLabel: "Կառավարում",
     octaveLabel: "Ստեղնաշարի օկտավա",
     keyboardLabel: "Դաշնամուրի ստեղնաշար",
+    trainerTab: "Վարժարան",
+    audioTab: "Աուդիո դեպի MIDI",
+    hubTab: "Open Free Tools",
     readError: "Չհաջողվեց կարդալ MIDI ֆայլը:",
   },
   de: {
@@ -109,6 +115,9 @@ export const translations = {
     toolbarLabel: "Steuerung",
     octaveLabel: "Tastatur-Oktave",
     keyboardLabel: "Klavier-Tastatur",
+    trainerTab: "Trainer",
+    audioTab: "Audio zu MIDI",
+    hubTab: "Open Free Tools",
     readError: "Die MIDI-Datei konnte nicht gelesen werden.",
   },
   es: {
@@ -143,6 +152,9 @@ export const translations = {
     toolbarLabel: "Controles",
     octaveLabel: "Octava del teclado",
     keyboardLabel: "Teclado de piano",
+    trainerTab: "Entrenador",
+    audioTab: "Audio a MIDI",
+    hubTab: "Open Free Tools",
     readError: "No se pudo leer el archivo MIDI.",
   },
   en: {
@@ -177,6 +189,9 @@ export const translations = {
     toolbarLabel: "Controls",
     octaveLabel: "Keyboard octave",
     keyboardLabel: "Piano keyboard",
+    trainerTab: "Trainer",
+    audioTab: "Audio to MIDI",
+    hubTab: "Open Free Tools",
     readError: "Could not read the MIDI file.",
   },
 };
@@ -184,7 +199,8 @@ export const translations = {
 export function detectLanguage() {
   if (LANGUAGES.includes(window.INITIAL_LANGUAGE)) return window.INITIAL_LANGUAGE;
 
-  const pathLang = window.location.pathname.split("/").filter(Boolean).at(-1);
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const pathLang = pathParts.find((part) => LANGUAGES.includes(part));
   if (LANGUAGES.includes(pathLang)) return pathLang;
 
   const queryLang = new URLSearchParams(window.location.search).get("lang");

@@ -36,7 +36,7 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"ok": True}
+    return {"ok": True, "max_upload_mb": MAX_UPLOAD_MB}
 
 
 @app.post("/convert")
@@ -45,7 +45,7 @@ async def convert(file: UploadFile = File(...)):
     if suffix not in ALLOWED_SUFFIXES:
         raise HTTPException(
             status_code=400,
-            detail="Поддерживаются только MP3, WAV, OGG, FLAC и M4A.",
+            detail="Only MP3, WAV, OGG, FLAC and M4A files are supported.",
         )
 
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -60,7 +60,7 @@ async def convert(file: UploadFile = File(...)):
                 if size > MAX_UPLOAD_BYTES:
                     raise HTTPException(
                         status_code=413,
-                        detail=f"Файл слишком большой. Лимит MVP: {MAX_UPLOAD_MB} MB.",
+                        detail=f"The file is too large. MVP limit: {MAX_UPLOAD_MB} MB.",
                     )
                 output.write(chunk)
 
@@ -70,7 +70,7 @@ async def convert(file: UploadFile = File(...)):
             _, midi_data, note_events = predict(str(input_path))
             midi_data.write(str(output_path))
         except Exception as error:
-            raise HTTPException(status_code=500, detail=f"Не удалось создать MIDI: {error}") from error
+            raise HTTPException(status_code=500, detail=f"Could not create MIDI: {error}") from error
 
         public_name = f"{safe_stem(file.filename)}.mid"
         midi_bytes = output_path.read_bytes()
