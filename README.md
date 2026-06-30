@@ -79,6 +79,20 @@ Expected response headers:
 
 Use a legal reference MIDI exported from a service, notation app, DAW, or manual transcription. Do not automate private paid services or bypass their limits.
 
+Browser comparison tool:
+
+```text
+https://john1912-7.github.io/midi-piano-trainer/benchmark/
+```
+
+Use it to upload:
+
+- the original audio for context;
+- the official/reference MIDI;
+- a MIDI from another service;
+- our generated MIDI;
+- optionally, a previous version of our MIDI for before/after regression checks.
+
 Compare two MIDI files:
 
 ```bash

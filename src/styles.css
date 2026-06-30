@@ -500,6 +500,197 @@ select {
   color: var(--muted);
 }
 
+.benchmark-app {
+  max-width: 1280px;
+}
+
+.benchmark-toolbar {
+  grid-template-columns: minmax(260px, 1fr) auto auto;
+}
+
+.benchmark-intro {
+  max-width: 980px;
+}
+
+.benchmark-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.benchmark-file-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--panel);
+}
+
+.benchmark-file-card.required {
+  border-color: rgba(40, 215, 178, 0.5);
+}
+
+.benchmark-file-card span {
+  font-weight: 800;
+}
+
+.benchmark-file-card input {
+  max-width: 100%;
+}
+
+.benchmark-file-card small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.benchmark-settings {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.benchmark-settings input[type="number"] {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: var(--panel-2);
+  color: #f4f7f8;
+}
+
+.benchmark-status {
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+}
+
+.benchmark-results {
+  display: grid;
+  gap: 16px;
+}
+
+.benchmark-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.benchmark-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.benchmark-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  background: var(--panel);
+}
+
+.benchmark-table th,
+.benchmark-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.benchmark-table th:first-child,
+.benchmark-table td:first-child {
+  text-align: left;
+}
+
+.benchmark-table thead th {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.benchmark-table tr:last-child th,
+.benchmark-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.reference-row {
+  background: rgba(40, 215, 178, 0.08);
+}
+
+.good-score {
+  color: var(--good);
+  font-weight: 900;
+}
+
+.warn-score {
+  color: var(--accent-2);
+  font-weight: 900;
+}
+
+.bad-score {
+  color: var(--danger);
+  font-weight: 900;
+}
+
+.diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.diagnostic-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--panel);
+}
+
+.diagnostic-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.diagnostic-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.metric-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.metric-bar {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #111418;
+}
+
+.metric-bar span,
+.metric-bar strong {
+  position: relative;
+  z-index: 1;
+}
+
+.metric-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: rgba(40, 215, 178, 0.16);
+}
+
 .backend-url-control {
   display: grid;
   gap: 6px;
@@ -620,6 +811,14 @@ select {
   .converter-controls {
     justify-content: stretch;
   }
+
+  .benchmark-toolbar,
+  .benchmark-grid,
+  .benchmark-settings,
+  .benchmark-status,
+  .diagnostic-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -634,5 +833,13 @@ select {
 
   .stage-wrap {
     min-height: 360px;
+  }
+
+  .benchmark-result-actions {
+    justify-content: stretch;
+  }
+
+  .benchmark-result-actions button {
+    width: 100%;
   }
 }

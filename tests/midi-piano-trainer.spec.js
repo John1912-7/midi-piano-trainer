@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 
 test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ page }) => {
   const consoleErrors = [];
@@ -258,6 +260,37 @@ test("opens generated MIDI from the audio-to-midi tab in the trainer", async ({ 
   await expect(page.locator("#noteCount")).toHaveText("3");
   await expect(page.locator("#playButton")).toBeEnabled();
   await expect(page.locator("#listenButton")).toBeEnabled();
+});
+
+test("compares official, external, and generated MIDI files in the benchmark tool", async ({ page }) => {
+  const files = {
+    audio: resolve("benchmarks/external-service/maestro/chopin-op25-first20s.wav"),
+    reference: resolve("benchmarks/external-service/maestro/chopin-op25-reference-first20s.mid"),
+    external: resolve("benchmarks/external-service/maestro/eldoraudio-chopin-op25-first20s.mid"),
+    ours: resolve("benchmarks/runs/maestro-chopin-op25-20s/chopin-op25-first20s.balanced.mid"),
+  };
+  test.skip(
+    !Object.values(files).every((file) => existsSync(file)),
+    "Requires local MAESTRO/Eldoraudio benchmark files.",
+  );
+
+  await page.goto("/benchmark/");
+
+  await expect(page.getByRole("heading", { name: "MIDI Quality Benchmark" })).toBeVisible();
+  await page.locator("#audioFile").setInputFiles(files.audio);
+  await page.locator("#referenceMidi").setInputFiles(files.reference);
+  await page.locator("#externalMidi").setInputFiles(files.external);
+  await page.locator("#oursMidi").setInputFiles(files.ours);
+
+  await page.locator("#compareButton").click();
+
+  await expect(page.locator("#benchmarkStatus")).toHaveText("Comparison ready");
+  await expect(page.locator("#referenceNotes")).toHaveText("303");
+  await expect(page.locator("#bestCandidate")).toContainText("External service 91.8%");
+  await expect(page.locator("#ourScore")).toHaveText("50.5%");
+  await expect(page.locator("#summaryRows")).toContainText("Official reference");
+  await expect(page.locator("#summaryRows")).toContainText("Our MIDI");
+  await expect(page.locator("#diagnosticCards")).toContainText("Missed notes: 193");
 });
 
 function createMidiFile(notesOrTracks) {

@@ -3,6 +3,7 @@ import { writeFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { pathToFileURL } from "node:url";
 import { compareMidiFiles } from "./compare-midi.mjs";
+import { formatSetReport } from "../src/midi/compareMidi.js";
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = await main(process.argv.slice(2)).catch((error) => {
@@ -88,48 +89,6 @@ function parseCandidate(value) {
     label: value.slice(0, splitAt),
     path: value.slice(splitAt + 1),
   };
-}
-
-function formatSetReport({ reference, reports }) {
-  const rows = reports
-    .map(({ label, report }) => {
-      const { summary, timing } = report;
-      return [
-        `| ${label}`,
-        report.files.candidate,
-        `${summary.overallMatchPercent}%`,
-        `${summary.noteCorrectnessPercent}%`,
-        `${summary.extraNoteControlPercent}%`,
-        `${summary.timingAccuracyPercent}%`,
-        `${summary.noteDurationAccuracyPercent}%`,
-        `${summary.totalDurationSimilarityPercent}%`,
-        summary.tempoSimilarityPercent === null ? "unknown" : `${summary.tempoSimilarityPercent}%`,
-        summary.referenceNotes,
-        summary.candidateNotes,
-        summary.missedNotes,
-        summary.extraNotes,
-        `${summary.averageAbsoluteOnsetErrorMs} ms`,
-        `${summary.averageAbsoluteDurationErrorMs} ms`,
-        `${timing.candidateDurationSeconds}s |`,
-      ].join(" | ");
-    })
-    .join("\n");
-
-  return [
-    `# MIDI Quality Comparison`,
-    ``,
-    `Reference: ${reference}`,
-    ``,
-    `| Source | File | Overall | Notes correct | Extra-note control | Timing | Note duration | Total duration | Tempo | Ref notes | Candidate notes | Missed | Extra | Avg onset error | Avg duration error | Duration |`,
-    `| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |`,
-    rows,
-    ``,
-    `Overall is the note-level F1 score against the official reference MIDI.`,
-    `Notes correct is recall: how many official reference notes were found.`,
-    `Extra-note control is precision: how many candidate notes were not false positives.`,
-    `Timing and note duration are calculated only on matched notes.`,
-    ``,
-  ].join("\n");
 }
 
 function printUsage() {
