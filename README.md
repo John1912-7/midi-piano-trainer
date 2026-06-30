@@ -85,6 +85,12 @@ Compare two MIDI files:
 npm run compare:midi -- reference.mid converted.mid --markdown report.md --json report.json
 ```
 
+Compare an official MIDI against multiple candidates, for example an external service and our backend:
+
+```bash
+npm run compare:midi-set -- --reference official.mid --candidate "External=external.mid" --candidate "Ours=ours.mid" --markdown summary.md
+```
+
 Benchmark our backend against one audio file and one reference MIDI:
 
 ```bash
@@ -96,8 +102,8 @@ The benchmark converts the same audio with `clean`, `balanced`, and `sensitive`,
 The report focuses on:
 
 - matched, missed, extra, and near-onset wrong-pitch notes;
-- precision, recall, and F1;
-- average timing error;
+- overall match, note correctness, extra-note control, timing, note duration, total duration, and tempo similarity;
+- average onset and duration error;
 - most missed and most extra pitches.
 
 ## Local Site

@@ -112,7 +112,19 @@ function printUsage() {
 
 function formatBenchmarkSummary({ audio, reference, backend, runDir, summaries }) {
   const rows = summaries
-    .map(({ preset, summary }) => `| ${preset} | ${summary.f1} | ${summary.precision} | ${summary.recall} | ${summary.missedNotes} | ${summary.extraNotes} | ${summary.averageAbsoluteOnsetErrorMs} ms |`)
+    .map(({ preset, summary }) => [
+      `| ${preset}`,
+      `${summary.overallMatchPercent}%`,
+      `${summary.noteCorrectnessPercent}%`,
+      `${summary.extraNoteControlPercent}%`,
+      `${summary.timingAccuracyPercent}%`,
+      `${summary.noteDurationAccuracyPercent}%`,
+      `${summary.totalDurationSimilarityPercent}%`,
+      summary.tempoSimilarityPercent === null ? "unknown" : `${summary.tempoSimilarityPercent}%`,
+      summary.missedNotes,
+      summary.extraNotes,
+      `${summary.averageAbsoluteOnsetErrorMs} ms |`,
+    ].join(" | "))
     .join("\n");
 
   const best = [...summaries].sort((a, b) => b.summary.f1 - a.summary.f1)[0];
@@ -126,8 +138,8 @@ function formatBenchmarkSummary({ audio, reference, backend, runDir, summaries }
     ``,
     `Best preset by F1: ${best?.preset || "none"}`,
     ``,
-    `| Preset | F1 | Precision | Recall | Missed | Extra | Avg onset error |`,
-    `| --- | ---: | ---: | ---: | ---: | ---: | ---: |`,
+    `| Preset | Overall | Notes | Extra-note control | Timing | Note duration | Total duration | Tempo | Missed | Extra | Avg onset error |`,
+    `| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |`,
     rows,
     ``,
   ].join("\n");

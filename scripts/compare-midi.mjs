@@ -54,6 +54,8 @@ export async function compareMidiFiles(referencePath, candidatePath, options = {
     ...options,
     referencePath,
     candidatePath,
+    referenceTempo: readTempoSummary(referenceBuffer) || defaultTempoSummary(),
+    candidateTempo: readTempoSummary(candidateBuffer) || defaultTempoSummary(),
   });
 }
 
@@ -103,6 +105,18 @@ export function compareSongs(referenceSong, candidateSong, options = {}) {
   const precision = safeRatio(matches.length, candidateNotes.length);
   const recall = safeRatio(matches.length, referenceNotes.length);
   const f1 = precision + recall ? (2 * precision * recall) / (precision + recall) : 0;
+  const averageAbsoluteOnsetErrorSeconds = average(matches.map((match) => Math.abs(match.onsetDelta)));
+  const averageAbsoluteDurationErrorSeconds = average(matches.map((match) => Math.abs(match.durationDelta)));
+  const durationSimilarity = similarity(referenceSong.duration, candidateSong.duration);
+  const tempoSimilarity = settings.referenceTempo && settings.candidateTempo
+    ? similarity(settings.referenceTempo.primaryBpm, settings.candidateTempo.primaryBpm)
+    : null;
+  const timingAccuracy = matches.length
+    ? clamp01(1 - averageAbsoluteOnsetErrorSeconds / settings.onsetTolerance)
+    : 0;
+  const noteDurationAccuracy = matches.length
+    ? clamp01(1 - averageAbsoluteDurationErrorSeconds / settings.durationTolerance)
+    : 0;
 
   return {
     files: {
@@ -114,6 +128,15 @@ export function compareSongs(referenceSong, candidateSong, options = {}) {
       durationToleranceSeconds: settings.durationTolerance,
       pitchToleranceSemitones: settings.pitchTolerance,
     },
+    timing: {
+      referenceDurationSeconds: round(referenceSong.duration, 3),
+      candidateDurationSeconds: round(candidateSong.duration, 3),
+      durationDeltaSeconds: round(candidateSong.duration - referenceSong.duration, 3),
+      referenceTempoBpm: settings.referenceTempo?.primaryBpm ?? null,
+      candidateTempoBpm: settings.candidateTempo?.primaryBpm ?? null,
+      referenceTempoEvents: settings.referenceTempo?.eventCount ?? null,
+      candidateTempoEvents: settings.candidateTempo?.eventCount ?? null,
+    },
     summary: {
       referenceNotes: referenceNotes.length,
       candidateNotes: candidateNotes.length,
@@ -124,8 +147,15 @@ export function compareSongs(referenceSong, candidateSong, options = {}) {
       precision: round(precision),
       recall: round(recall),
       f1: round(f1),
-      averageAbsoluteOnsetErrorMs: round(average(matches.map((match) => Math.abs(match.onsetDelta))) * 1000, 1),
-      averageAbsoluteDurationErrorMs: round(average(matches.map((match) => Math.abs(match.durationDelta))) * 1000, 1),
+      overallMatchPercent: round(f1 * 100, 1),
+      noteCorrectnessPercent: round(recall * 100, 1),
+      extraNoteControlPercent: round(precision * 100, 1),
+      timingAccuracyPercent: round(timingAccuracy * 100, 1),
+      noteDurationAccuracyPercent: round(noteDurationAccuracy * 100, 1),
+      totalDurationSimilarityPercent: round(durationSimilarity * 100, 1),
+      tempoSimilarityPercent: tempoSimilarity === null ? null : round(tempoSimilarity * 100, 1),
+      averageAbsoluteOnsetErrorMs: round(averageAbsoluteOnsetErrorSeconds * 1000, 1),
+      averageAbsoluteDurationErrorMs: round(averageAbsoluteDurationErrorSeconds * 1000, 1),
     },
     diagnostics: {
       mostMissedPitches: pitchHistogram(missed).slice(0, 10),
@@ -141,7 +171,7 @@ export function compareSongs(referenceSong, candidateSong, options = {}) {
 }
 
 export function formatReport(report) {
-  const { summary, files, settings, diagnostics } = report;
+  const { summary, files, settings, diagnostics, timing } = report;
   return [
     `# MIDI Compare Report`,
     ``,
@@ -159,8 +189,23 @@ export function formatReport(report) {
     `- Precision: ${percent(summary.precision)}`,
     `- Recall: ${percent(summary.recall)}`,
     `- F1: ${percent(summary.f1)}`,
+    `- Overall match: ${summary.overallMatchPercent}%`,
+    `- Note correctness: ${summary.noteCorrectnessPercent}%`,
+    `- Extra-note control: ${summary.extraNoteControlPercent}%`,
+    `- Timing accuracy: ${summary.timingAccuracyPercent}%`,
+    `- Note duration accuracy: ${summary.noteDurationAccuracyPercent}%`,
+    `- Total duration similarity: ${summary.totalDurationSimilarityPercent}%`,
+    `- Tempo similarity: ${summary.tempoSimilarityPercent === null ? "unknown" : `${summary.tempoSimilarityPercent}%`}`,
     `- Avg onset error: ${summary.averageAbsoluteOnsetErrorMs} ms`,
     `- Avg duration error: ${summary.averageAbsoluteDurationErrorMs} ms`,
+    ``,
+    `## Timing / Tempo`,
+    ``,
+    `- Reference duration: ${timing.referenceDurationSeconds}s`,
+    `- Candidate duration: ${timing.candidateDurationSeconds}s`,
+    `- Duration delta: ${timing.durationDeltaSeconds}s`,
+    `- Reference tempo: ${timing.referenceTempoBpm ?? "unknown"} BPM`,
+    `- Candidate tempo: ${timing.candidateTempoBpm ?? "unknown"} BPM`,
     ``,
     `## Settings`,
     ``,
@@ -266,6 +311,18 @@ function average(values) {
   return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 }
 
+function similarity(reference, candidate) {
+  if (!Number.isFinite(reference) || !Number.isFinite(candidate)) return 0;
+  if (reference <= 0 && candidate <= 0) return 1;
+  if (reference <= 0 || candidate <= 0) return 0;
+  return clamp01(Math.min(reference, candidate) / Math.max(reference, candidate));
+}
+
+function clamp01(value) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(1, value));
+}
+
 function safeRatio(value, total) {
   return total ? value / total : 0;
 }
@@ -281,4 +338,93 @@ function round(value, digits = 3) {
 
 function bufferToArrayBuffer(buffer) {
   return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+}
+
+function readTempoSummary(buffer) {
+  const view = new DataView(bufferToArrayBuffer(buffer));
+  let offset = 0;
+  const readString = (length) => {
+    let value = "";
+    for (let index = 0; index < length; index += 1) value += String.fromCharCode(view.getUint8(offset++));
+    return value;
+  };
+  const readUint16 = () => {
+    const value = view.getUint16(offset);
+    offset += 2;
+    return value;
+  };
+  const readUint32 = () => {
+    const value = view.getUint32(offset);
+    offset += 4;
+    return value;
+  };
+  const readVarLength = () => {
+    let value = 0;
+    while (offset < view.byteLength) {
+      const byte = view.getUint8(offset++);
+      value = (value << 7) | (byte & 0x7f);
+      if ((byte & 0x80) === 0) break;
+    }
+    return value;
+  };
+
+  if (readString(4) !== "MThd") return null;
+  const headerLength = readUint32();
+  offset += 2;
+  const trackCount = readUint16();
+  offset += 2;
+  offset = 8 + headerLength;
+
+  const tempos = [];
+  for (let trackIndex = 0; trackIndex < trackCount && offset < view.byteLength; trackIndex += 1) {
+    if (readString(4) !== "MTrk") return null;
+    const endOffset = offset + readUint32();
+    let runningStatus = null;
+
+    while (offset < endOffset) {
+      readVarLength();
+      let status = view.getUint8(offset++);
+      if (status < 0x80) {
+        offset -= 1;
+        if (runningStatus === null) break;
+        status = runningStatus;
+      } else if (status < 0xf0) {
+        runningStatus = status;
+      }
+
+      if (status === 0xff) {
+        const type = view.getUint8(offset++);
+        const length = readVarLength();
+        if (type === 0x51 && length === 3) {
+          const microsecondsPerQuarter =
+            (view.getUint8(offset) << 16) |
+            (view.getUint8(offset + 1) << 8) |
+            view.getUint8(offset + 2);
+          tempos.push(round(60000000 / microsecondsPerQuarter, 3));
+        }
+        offset += length;
+      } else if (status === 0xf0 || status === 0xf7) {
+        offset += readVarLength();
+      } else {
+        const eventType = status >> 4;
+        offset += [0xc, 0xd].includes(eventType) ? 1 : 2;
+      }
+    }
+    offset = endOffset;
+  }
+
+  const primaryBpm = tempos.length ? tempos[0] : 120;
+  return {
+    primaryBpm,
+    eventCount: tempos.length,
+    uniqueBpm: [...new Set(tempos)].slice(0, 12),
+  };
+}
+
+function defaultTempoSummary() {
+  return {
+    primaryBpm: 120,
+    eventCount: 0,
+    uniqueBpm: [120],
+  };
 }
