@@ -27,7 +27,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir _site
-          cp -r src en ru de es hy _site/
+          cp -r src en ru de es hy benchmark _site/
           cp index.html robots.txt sitemap.xml google8b4e27dc5ecfdc8c.html .nojekyll _site/
 
       - name: Configure Pages
