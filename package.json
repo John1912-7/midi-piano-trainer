@@ -6,7 +6,9 @@
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "compare:midi": "node scripts/compare-midi.mjs",
+    "benchmark:audio": "node scripts/benchmark-audio-midi.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1"

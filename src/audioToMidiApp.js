@@ -1,6 +1,7 @@
 const MAX_AUDIO_MB = 25;
 const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
+const QUALITY_PRESET_KEY = "midiPianoTrainerAudioQuality";
 const DEFAULT_BACKEND_URL = "https://vanya1912-midi-piano-trainer-backend.hf.space";
 
 const copy = {
@@ -127,6 +128,7 @@ const elements = {
   selectedFileMeta: document.querySelector("#selectedFileMeta"),
   limitLabel: document.querySelector("#audioLimitLabel"),
   languageSelect: document.querySelector("#audioLanguageSelect"),
+  quality: document.querySelector("#qualityPreset"),
 };
 
 const language = getLanguage();
@@ -137,7 +139,9 @@ let generatedMidiBytes = null;
 let generatedMidiName = "converted.mid";
 let resultUrl = "";
 
+ensureQualityControl();
 elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || DEFAULT_BACKEND_URL;
+if (elements.quality) elements.quality.value = localStorage.getItem(QUALITY_PRESET_KEY) || "clean";
 if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB`;
 if (elements.languageSelect) elements.languageSelect.value = language;
 setStatus(text.chooseFile);
@@ -150,6 +154,10 @@ elements.languageSelect?.addEventListener("change", () => {
 elements.backendUrl.addEventListener("input", () => {
   localStorage.setItem(BACKEND_URL_KEY, elements.backendUrl.value.trim());
   updateConvertState();
+});
+
+elements.quality?.addEventListener("change", () => {
+  localStorage.setItem(QUALITY_PRESET_KEY, getQualityPreset());
 });
 
 elements.checkBackend.addEventListener("click", async () => {
@@ -208,6 +216,7 @@ elements.convert.addEventListener("click", async () => {
     setStatus(text.sending);
 
     const formData = new FormData();
+    formData.append("quality", getQualityPreset());
     formData.append("file", selectedFile, selectedFile.name);
 
     const response = await fetch(`${backendUrl}/convert`, {
@@ -286,10 +295,49 @@ function resetResult() {
 function setBusy(isBusy, checkLabel = text.checkBackend, convertLabel = text.converting) {
   elements.backendUrl.disabled = isBusy;
   elements.file.disabled = isBusy;
+  if (elements.quality) elements.quality.disabled = isBusy;
   elements.checkBackend.disabled = isBusy || !normalizeBackendUrl(elements.backendUrl.value);
   elements.convert.disabled = isBusy || !selectedFile;
   elements.checkBackend.textContent = isBusy ? checkLabel : text.checkBackend;
   elements.convert.textContent = isBusy ? convertLabel : text.convertIdle;
+}
+
+function ensureQualityControl() {
+  if (elements.quality) return;
+  const controls = document.querySelector(".converter-controls");
+  if (!controls) return;
+
+  const label = document.createElement("label");
+  label.className = "quality-control";
+
+  const labelText = document.createElement("span");
+  labelText.textContent = "Quality";
+
+  const select = document.createElement("select");
+  select.id = "qualityPreset";
+
+  for (const [value, labelValue] of [
+    ["clean", "Clean"],
+    ["balanced", "Balanced"],
+    ["sensitive", "Sensitive"],
+  ]) {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = labelValue;
+    select.append(option);
+  }
+
+  const help = document.createElement("small");
+  help.textContent = "Clean is stricter; Sensitive catches more notes.";
+
+  label.append(labelText, select, help);
+  controls.insertBefore(label, elements.convert);
+  elements.quality = select;
+}
+
+function getQualityPreset() {
+  const value = elements.quality?.value || "clean";
+  return ["clean", "balanced", "sensitive"].includes(value) ? value : "clean";
 }
 
 function setSelectedFile(file) {

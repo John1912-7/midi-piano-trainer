@@ -2,7 +2,7 @@ import os
 import tempfile
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 
@@ -25,7 +25,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["X-Midi-Filename", "X-Note-Count"],
+    expose_headers=["X-Midi-Filename", "X-Note-Count", "X-Quality-Preset"],
 )
 
 
@@ -36,11 +36,11 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"ok": True, "max_upload_mb": MAX_UPLOAD_MB}
+    return {"ok": True, "max_upload_mb": MAX_UPLOAD_MB, "quality_presets": list(QUALITY_PRESETS)}
 
 
 @app.post("/convert")
-async def convert(file: UploadFile = File(...)):
+async def convert(file: UploadFile = File(...), quality: str = Form("clean")):
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in ALLOWED_SUFFIXES:
         raise HTTPException(
@@ -67,7 +67,19 @@ async def convert(file: UploadFile = File(...)):
         try:
             from basic_pitch.inference import predict
 
-            _, midi_data, note_events = predict(str(input_path))
+            preset_name = quality if quality in QUALITY_PRESETS else "clean"
+            preset = QUALITY_PRESETS[preset_name]
+            _, midi_data, _note_events = predict(
+                str(input_path),
+                onset_threshold=preset["onset_threshold"],
+                frame_threshold=preset["frame_threshold"],
+                minimum_note_length=preset["minimum_note_length_ms"],
+                minimum_frequency=preset["minimum_frequency"],
+                maximum_frequency=preset["maximum_frequency"],
+                melodia_trick=True,
+                midi_tempo=120,
+            )
+            cleaned_note_count = clean_midi(midi_data, preset)
             midi_data.write(str(output_path))
         except Exception as error:
             raise HTTPException(status_code=500, detail=f"Could not create MIDI: {error}") from error
@@ -81,7 +93,8 @@ async def convert(file: UploadFile = File(...)):
             headers={
                 "Content-Disposition": f'attachment; filename="{public_name}"',
                 "X-Midi-Filename": public_name,
-                "X-Note-Count": str(len(note_events)),
+                "X-Note-Count": str(cleaned_note_count),
+                "X-Quality-Preset": preset_name,
             },
         )
 
@@ -95,3 +108,66 @@ def safe_stem(filename: str | None) -> str:
     stem = Path(filename or "converted").stem
     cleaned = "".join(char if char.isalnum() or char in "-_." else "-" for char in stem).strip("-")
     return cleaned or "converted"
+
+
+QUALITY_PRESETS = {
+    "clean": {
+        "onset_threshold": 0.68,
+        "frame_threshold": 0.45,
+        "minimum_note_length_ms": 180.0,
+        "minimum_frequency": 55.0,
+        "maximum_frequency": 2200.0,
+        "min_duration_seconds": 0.09,
+        "min_velocity": 24,
+        "merge_gap_seconds": 0.035,
+    },
+    "balanced": {
+        "onset_threshold": 0.55,
+        "frame_threshold": 0.35,
+        "minimum_note_length_ms": 130.0,
+        "minimum_frequency": 45.0,
+        "maximum_frequency": 3000.0,
+        "min_duration_seconds": 0.055,
+        "min_velocity": 18,
+        "merge_gap_seconds": 0.025,
+    },
+    "sensitive": {
+        "onset_threshold": 0.45,
+        "frame_threshold": 0.25,
+        "minimum_note_length_ms": 90.0,
+        "minimum_frequency": 35.0,
+        "maximum_frequency": 4200.0,
+        "min_duration_seconds": 0.035,
+        "min_velocity": 10,
+        "merge_gap_seconds": 0.015,
+    },
+}
+
+
+def clean_midi(midi_data, preset: dict[str, float]) -> int:
+    total = 0
+    for instrument in midi_data.instruments:
+        notes = [
+            note
+            for note in instrument.notes
+            if note.end - note.start >= preset["min_duration_seconds"]
+            and note.velocity >= preset["min_velocity"]
+        ]
+        instrument.notes = merge_repeated_notes(notes, preset["merge_gap_seconds"])
+        total += len(instrument.notes)
+    return total
+
+
+def merge_repeated_notes(notes, merge_gap_seconds: float):
+    merged = []
+    for note in sorted(notes, key=lambda item: (item.pitch, item.start, item.end)):
+        if (
+            merged
+            and merged[-1].pitch == note.pitch
+            and note.start - merged[-1].end <= merge_gap_seconds
+        ):
+            merged[-1].end = max(merged[-1].end, note.end)
+            merged[-1].velocity = max(merged[-1].velocity, note.velocity)
+        else:
+            merged.append(note)
+    return sorted(merged, key=lambda item: (item.start, item.pitch))

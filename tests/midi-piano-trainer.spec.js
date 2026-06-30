@@ -154,6 +154,7 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Бесплатный конвертер аудио в MIDI" })).toBeVisible();
   await expect(page.locator("#backendUrl")).toBeAttached();
   await expect(page.locator("#audioFile")).toBeAttached();
+  await expect(page.locator("#qualityPreset")).toHaveValue("clean");
   await expect(page.locator("#checkBackendButton")).toBeEnabled();
   await expect(page.locator("#convertAudioButton")).toBeDisabled();
   await expect(page.locator("#conversionProgress")).toHaveAttribute("value", "0");
@@ -185,6 +186,7 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
 
 test("converts audio through backend and opens the generated MIDI in the trainer", async ({ page }) => {
   const midi = createMidiFile([60, 64, 67]);
+  let convertBody = "";
 
   await page.route("http://127.0.0.1:7860/health", async (route) => {
     await route.fulfill({
@@ -195,6 +197,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   });
 
   await page.route("http://127.0.0.1:7860/convert", async (route) => {
+    convertBody = route.request().postDataBuffer()?.toString("utf8") || "";
     await route.fulfill({
       status: 200,
       contentType: "audio/midi",
@@ -210,6 +213,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
 
   await page.goto("/ru/audio-to-midi/");
   await page.locator("#backendUrl").fill("http://127.0.0.1:7860");
+  await page.locator("#qualityPreset").selectOption("balanced");
   await page.locator("#audioFile").setInputFiles({
     name: "test-tone.wav",
     mimeType: "audio/wav",
@@ -217,6 +221,8 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   });
 
   await page.locator("#convertAudioButton").click();
+  expect(convertBody).toContain('name="quality"');
+  expect(convertBody).toContain("balanced");
   await expect(page.locator("#conversionStatus")).toContainText("MIDI готов");
   await expect(page.locator("#generatedFileName")).toHaveText("test-tone.mid");
   await expect(page.locator("#generatedNoteCount")).toHaveText("3");

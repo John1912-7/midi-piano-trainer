@@ -61,12 +61,44 @@ https://vanya1912-midi-piano-trainer-backend.hf.space
 Endpoints:
 
 - `GET /health`
-- `POST /convert` with `multipart/form-data` field `file`
+- `POST /convert` with `multipart/form-data` fields `file` and optional `quality`
+
+Quality presets:
+
+- `clean` - stricter note detection, fewer false notes.
+- `balanced` - middle ground for most simple piano/audio clips.
+- `sensitive` - catches more notes, but can add more wrong/extra notes.
 
 Expected response headers:
 
 - `X-Midi-Filename`
 - `X-Note-Count`
+- `X-Quality-Preset`
+
+## Audio to MIDI Quality Checks
+
+Use a legal reference MIDI exported from a service, notation app, DAW, or manual transcription. Do not automate private paid services or bypass their limits.
+
+Compare two MIDI files:
+
+```bash
+npm run compare:midi -- reference.mid converted.mid --markdown report.md --json report.json
+```
+
+Benchmark our backend against one audio file and one reference MIDI:
+
+```bash
+npm run benchmark:audio -- audio.wav reference.mid
+```
+
+The benchmark converts the same audio with `clean`, `balanced`, and `sensitive`, then writes reports under `benchmarks/runs/`. These run folders are ignored by git because they can contain large generated files.
+
+The report focuses on:
+
+- matched, missed, extra, and near-onset wrong-pitch notes;
+- precision, recall, and F1;
+- average timing error;
+- most missed and most extra pitches.
 
 ## Local Site
 

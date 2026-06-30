@@ -463,6 +463,22 @@ select {
   justify-content: flex-end;
 }
 
+.quality-control {
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.quality-control select {
+  width: 100%;
+}
+
+.quality-control small {
+  line-height: 1.35;
+}
+
 .selected-file-card {
   display: grid;
   gap: 4px;
