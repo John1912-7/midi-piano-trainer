@@ -156,7 +156,7 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Бесплатный конвертер аудио в MIDI" })).toBeVisible();
   await expect(page.locator("#backendUrl")).toBeAttached();
   await expect(page.locator("#audioFile")).toBeAttached();
-  await expect(page.locator("#qualityPreset")).toHaveValue("clean");
+  await expect(page.locator("#qualityPreset")).toHaveValue("balanced");
   await expect(page.locator("#checkBackendButton")).toBeEnabled();
   await expect(page.locator("#convertAudioButton")).toBeDisabled();
   await expect(page.locator("#conversionProgress")).toHaveAttribute("value", "0");

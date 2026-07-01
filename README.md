@@ -38,6 +38,7 @@ Rules:
 - Do not download YouTube audio directly.
 - Do not make the backend required for the normal MIDI trainer.
 - Keep the file limit visible. Current MVP limit: 25 MB.
+- Keep the duration limit visible. Current backend MVP limit: 60 seconds.
 - Keep the backend URL user-configurable.
 
 Audio to MIDI pages:
@@ -52,6 +53,8 @@ Audio to MIDI pages:
 
 The optional backend lives in `backend/`.
 
+Current engine decision: Transkun is the primary audio-to-MIDI engine for piano recordings, including weak/noisy piano recordings. Basic Pitch is kept only as an optional legacy/fallback experiment, and Magenta Onsets and Frames is rejected for now because the official demo/Docker path was too slow and fragile for this free backend plan.
+
 Live MVP backend:
 
 ```text
@@ -65,15 +68,30 @@ Endpoints:
 
 Quality presets:
 
-- `clean` - stricter note detection, fewer false notes.
-- `balanced` - middle ground for most simple piano/audio clips.
-- `sensitive` - catches more notes, but can add more wrong/extra notes.
+- `clean` - Transkun without preprocessing, useful as a baseline.
+- `balanced` - Transkun with light high-pass filtering and volume normalization.
+- `sensitive` - experimental rescue mode for very noisy recordings; it can improve the worst phone/noise case slightly, but it hurts clean and normal recordings.
+
+Transkun is used for every profile. The `quality` field now selects the preprocessing profile before Transkun runs.
+
+Current weak-piano benchmark finding:
+
+- `balanced` is the safest default. It preserves clean recordings and slightly improves some phone/compressed variants.
+- `sensitive` improved the worst `weak-phone-noisy` case from 76.1% to 78.2%, but reduced clean/quiet recordings from about 97.7% to 94.9%. Do not make it the default.
+
+Current backend limits:
+
+- 25 MB maximum upload size.
+- 60 seconds maximum audio duration by default, configurable with `MAX_AUDIO_SECONDS`.
+- 900 seconds maximum conversion time by default, configurable with `MAX_CONVERSION_SECONDS`.
 
 Expected response headers:
 
 - `X-Midi-Filename`
 - `X-Note-Count`
 - `X-Quality-Preset`
+- `X-Transcription-Engine`
+- `X-Audio-Preprocess`
 
 ## Audio to MIDI Quality Checks
 
@@ -112,6 +130,22 @@ npm run benchmark:audio -- audio.wav reference.mid
 ```
 
 The benchmark converts the same audio with `clean`, `balanced`, and `sensitive`, then writes reports under `benchmarks/runs/`. These run folders are ignored by git because they can contain large generated files.
+
+Generate a weak-piano regression pack from the local MAESTRO benchmark clip:
+
+```bash
+npm run benchmark:weak-pack
+```
+
+This creates quiet, noisy, phone-filtered, compressed, room-echo, and combined weak-phone variants under `benchmarks/runs/weak-piano-pack/`.
+
+Run the regression pack against the live or local backend:
+
+```bash
+npm run benchmark:regression -- --backend https://vanya1912-midi-piano-trainer-backend.hf.space
+```
+
+Transkun CPU inference can be slow, so the full regression run may take a long time. Use this before replacing or tuning the engine, not on every tiny UI edit.
 
 The report focuses on:
 

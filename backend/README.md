@@ -12,7 +12,7 @@ license: mit
 
 Backend MVP for audio-to-MIDI conversion.
 
-This Space runs the optional backend for MIDI Piano Trainer. It accepts a user-uploaded audio file, converts it to MIDI with Basic Pitch, and returns a `.mid` file.
+This Space runs the optional backend for MIDI Piano Trainer. It accepts a user-uploaded audio file, converts piano audio to MIDI with Transkun, and returns a `.mid` file.
 
 Public frontend:
 
@@ -33,8 +33,23 @@ Supported input formats:
 - M4A
 
 Default file limit: 25 MB.
+Default duration limit: 60 seconds.
 
-Quality note: Basic Pitch works best with short, clean, single-instrument recordings. Full songs with drums, vocals, bass, and multiple instruments may produce noisy or inaccurate MIDI.
+Quality note: Transkun is the primary engine for piano recordings, including weaker/noisier piano recordings. It is not a general full-mix song transcriber: drums, vocals, bass, and multiple instruments may still produce noisy or inaccurate MIDI. CPU inference can be slow on free hosting, so short clips are required for the MVP.
+
+The backend accepts the `quality` field as a preprocessing profile before Transkun runs:
+
+- `clean` - no preprocessing, baseline behavior.
+- `balanced` - light high-pass filtering and volume normalization.
+- `sensitive` - experimental rescue mode for very noisy recordings; it can hurt clean recordings.
+
+To run the old Basic Pitch path as a local experiment, set:
+
+```text
+AUDIO_TO_MIDI_ENGINE=basic-pitch
+```
+
+That fallback requires installing Basic Pitch separately.
 
 ## Local Docker
 

@@ -2,4 +2,5 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 python-multipart==0.0.20
 numpy<2
-basic-pitch==0.4.0
+pretty-midi==0.2.11
+transkun==2.0.1

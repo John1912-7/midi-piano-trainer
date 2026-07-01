@@ -9,7 +9,9 @@
     "test:ui": "playwright test --ui",
     "compare:midi": "node scripts/compare-midi.mjs",
     "compare:midi-set": "node scripts/compare-midi-set.mjs",
-    "benchmark:audio": "node scripts/benchmark-audio-midi.mjs"
+    "benchmark:audio": "node scripts/benchmark-audio-midi.mjs",
+    "benchmark:weak-pack": "node scripts/create-weak-piano-benchmark-pack.mjs",
+    "benchmark:regression": "node scripts/benchmark-regression-pack.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1"

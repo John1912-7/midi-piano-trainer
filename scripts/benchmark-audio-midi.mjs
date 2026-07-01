@@ -27,7 +27,7 @@ async function main(args) {
   for (const preset of options.presets) {
     console.log(`Converting with preset: ${preset}`);
     const midiPath = join(runDir, `${safeStem(options.audio)}.${preset}.mid`);
-    await convertAudio({
+    const conversion = await convertAudio({
       backend: options.backend,
       audioPath: options.audio,
       outputPath: midiPath,
@@ -45,7 +45,15 @@ async function main(args) {
     const mdPath = join(runDir, `${preset}.compare.md`);
     await writeFile(jsonPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
     await writeFile(mdPath, formatReport(report), "utf8");
-    summaries.push({ preset, midiPath, jsonPath, mdPath, summary: report.summary });
+    summaries.push({
+      preset,
+      engine: conversion.engine,
+      preprocess: conversion.preprocess,
+      midiPath,
+      jsonPath,
+      mdPath,
+      summary: report.summary,
+    });
   }
 
   const summaryText = formatBenchmarkSummary({
@@ -81,6 +89,11 @@ async function convertAudio({ backend, audioPath, outputPath, quality }) {
 
   const midiBytes = new Uint8Array(await response.arrayBuffer());
   await writeFile(outputPath, midiBytes);
+  return {
+    engine: response.headers.get("X-Transcription-Engine") || "unknown",
+    preprocess: response.headers.get("X-Audio-Preprocess") || "unknown",
+    noteCount: response.headers.get("X-Note-Count") || "unknown",
+  };
 }
 
 function parseArgs(args) {
@@ -112,8 +125,10 @@ function printUsage() {
 
 function formatBenchmarkSummary({ audio, reference, backend, runDir, summaries }) {
   const rows = summaries
-    .map(({ preset, summary }) => [
+    .map(({ preset, engine, preprocess, summary }) => [
       `| ${preset}`,
+      engine,
+      preprocess,
       `${summary.overallMatchPercent}%`,
       `${summary.noteCorrectnessPercent}%`,
       `${summary.extraNoteControlPercent}%`,
@@ -138,8 +153,8 @@ function formatBenchmarkSummary({ audio, reference, backend, runDir, summaries }
     ``,
     `Best preset by F1: ${best?.preset || "none"}`,
     ``,
-    `| Preset | Overall | Notes | Extra-note control | Timing | Note duration | Total duration | Tempo | Missed | Extra | Avg onset error |`,
-    `| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |`,
+    `| Preset | Engine | Preprocess | Overall | Notes | Extra-note control | Timing | Note duration | Total duration | Tempo | Missed | Extra | Avg onset error |`,
+    `| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |`,
     rows,
     ``,
   ].join("\n");

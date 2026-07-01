@@ -26,6 +26,15 @@ Audio-to-MIDI is an experimental MVP. It accepts user-uploaded audio, sends it t
 
 Quality work should use legal reference MIDI files. A reference can come from a user's own manual transcription, DAW export, notation app, or a service export the user is allowed to use. Do not automate private paid services or bypass limits. Use `npm run benchmark:audio -- audio.wav reference.mid` to test our backend presets against the same reference.
 
+Current audio-to-MIDI engine decision:
+
+- Use Transkun as the primary piano audio-to-MIDI engine for clean, normal, and weak/noisy piano recordings.
+- Use Transkun preprocessing profiles before inference: `clean` = none, `balanced` = light normalization, `sensitive` = weak/noisy piano preprocessing.
+- Keep Basic Pitch only as an optional legacy/fallback experiment through `AUDIO_TO_MIDI_ENGINE=basic-pitch`.
+- Treat Magenta Onsets and Frames as rejected for now: official demo/backend setup was too slow and fragile for this free SaaS path.
+- Benchmark every engine change against legal reference MIDI before replacing Transkun.
+- Use `npm run benchmark:weak-pack` to generate weak piano variants from the legal local MAESTRO clip, then `npm run benchmark:regression` for slow full backend regression checks.
+
 ## Rules
 
 - Do not make backend required for the trainer.

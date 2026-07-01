@@ -1,4 +1,5 @@
 const MAX_AUDIO_MB = 25;
+const MAX_AUDIO_SECONDS = 60;
 const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
 const QUALITY_PRESET_KEY = "midiPianoTrainerAudioQuality";
@@ -88,6 +89,9 @@ const copy = {
       "No se pudo pasar el MIDI al entrenador. Descarga el MIDI y cargalo manualmente.",
     sleeping:
       "El backend tarda demasiado en responder. Comprueba la URL o espera a que el servidor gratuito despierte.",
+    longRunning:
+      "High-quality Transkun conversion can take several minutes on free servers.",
+    stillWorking: (elapsed) => `Still converting with Transkun... elapsed ${elapsed}.`,
   },
   en: {
     chooseFile: "Choose an audio file.",
@@ -109,6 +113,9 @@ const copy = {
       "Could not pass the MIDI to the trainer. Download the MIDI and upload it manually.",
     sleeping:
       "Backend is taking too long to respond. Check the URL or wait while the free server wakes up.",
+    longRunning:
+      "High-quality Transkun conversion can take several minutes on free servers.",
+    stillWorking: (elapsed) => `Still converting with Transkun... elapsed ${elapsed}.`,
   },
 };
 
@@ -138,11 +145,12 @@ let selectedFile = null;
 let generatedMidiBytes = null;
 let generatedMidiName = "converted.mid";
 let resultUrl = "";
+let conversionTimer = 0;
 
 ensureQualityControl();
 elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || DEFAULT_BACKEND_URL;
-if (elements.quality) elements.quality.value = localStorage.getItem(QUALITY_PRESET_KEY) || "clean";
-if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB`;
+if (elements.quality) elements.quality.value = localStorage.getItem(QUALITY_PRESET_KEY) || "balanced";
+if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB / ${MAX_AUDIO_SECONDS}s`;
 if (elements.languageSelect) elements.languageSelect.value = language;
 setStatus(text.chooseFile);
 updateConvertState();
@@ -213,7 +221,8 @@ elements.convert.addEventListener("click", async () => {
   try {
     setBusy(true);
     setProgress(8);
-    setStatus(text.sending);
+    startConversionTimer();
+    setStatus(`${text.sending} ${text.longRunning || copy.en.longRunning}`);
 
     const formData = new FormData();
     formData.append("quality", getQualityPreset());
@@ -235,8 +244,10 @@ elements.convert.addEventListener("click", async () => {
     generatedMidiBytes = new Uint8Array(await response.arrayBuffer());
     generatedMidiName = response.headers.get("X-Midi-Filename") || `${cleanFileName(selectedFile.name)}.mid`;
     const noteCount = response.headers.get("X-Note-Count") || "?";
+    const engine = response.headers.get("X-Transcription-Engine") || "transkun";
+    const preprocess = response.headers.get("X-Audio-Preprocess") || "";
 
-    showResult(noteCount);
+    showResult(noteCount, engine, preprocess);
     setProgress(100);
     setStatus(text.ready);
   } catch (error) {
@@ -244,6 +255,7 @@ elements.convert.addEventListener("click", async () => {
     setProgress(0);
     setStatus(error.message || text.failed);
   } finally {
+    stopConversionTimer();
     setBusy(false);
   }
 });
@@ -273,7 +285,7 @@ function updateConvertState() {
   elements.checkBackend.disabled = !hasBackend;
 }
 
-function showResult(noteCount) {
+function showResult(noteCount, engine, preprocess) {
   if (resultUrl) URL.revokeObjectURL(resultUrl);
   const blob = new Blob([generatedMidiBytes], { type: "audio/midi" });
   resultUrl = URL.createObjectURL(blob);
@@ -281,6 +293,7 @@ function showResult(noteCount) {
   elements.download.download = generatedMidiName;
   elements.fileName.textContent = generatedMidiName;
   elements.noteCount.textContent = noteCount.toString();
+  showEngineName(engine, preprocess);
   elements.result.hidden = false;
 }
 
@@ -288,8 +301,25 @@ function resetResult() {
   generatedMidiBytes = null;
   elements.result.hidden = true;
   elements.download.removeAttribute("href");
+  showEngineName("");
   if (resultUrl) URL.revokeObjectURL(resultUrl);
   resultUrl = "";
+}
+
+function showEngineName(engine, preprocess) {
+  let engineElement = document.querySelector("#generatedEngineName");
+  if (!engineElement) {
+    const container = document.createElement("div");
+    container.className = "generated-engine";
+    const label = document.createElement("span");
+    label.className = "muted";
+    label.textContent = "Engine";
+    engineElement = document.createElement("strong");
+    engineElement.id = "generatedEngineName";
+    container.append(label, engineElement);
+    elements.result.insertBefore(container, elements.download);
+  }
+  engineElement.textContent = preprocess && preprocess !== "none" ? `${engine} + ${preprocess}` : engine;
 }
 
 function setBusy(isBusy, checkLabel = text.checkBackend, convertLabel = text.converting) {
@@ -300,6 +330,21 @@ function setBusy(isBusy, checkLabel = text.checkBackend, convertLabel = text.con
   elements.convert.disabled = isBusy || !selectedFile;
   elements.checkBackend.textContent = isBusy ? checkLabel : text.checkBackend;
   elements.convert.textContent = isBusy ? convertLabel : text.convertIdle;
+}
+
+function startConversionTimer() {
+  stopConversionTimer();
+  const startedAt = Date.now();
+  conversionTimer = window.setInterval(() => {
+    const elapsed = formatElapsed(Date.now() - startedAt);
+    setStatus((text.stillWorking || copy.en.stillWorking)(elapsed));
+  }, 15000);
+}
+
+function stopConversionTimer() {
+  if (!conversionTimer) return;
+  window.clearInterval(conversionTimer);
+  conversionTimer = 0;
 }
 
 function ensureQualityControl() {
@@ -317,9 +362,9 @@ function ensureQualityControl() {
   select.id = "qualityPreset";
 
   for (const [value, labelValue] of [
-    ["clean", "Clean"],
-    ["balanced", "Balanced"],
-    ["sensitive", "Sensitive"],
+    ["clean", "Clean - no preprocessing"],
+    ["balanced", "Balanced - normalize"],
+    ["sensitive", "Sensitive - experimental rescue"],
   ]) {
     const option = document.createElement("option");
     option.value = value;
@@ -328,7 +373,7 @@ function ensureQualityControl() {
   }
 
   const help = document.createElement("small");
-  help.textContent = "Clean is stricter; Sensitive catches more notes.";
+  help.textContent = "Balanced is safest. Sensitive may help very noisy audio, but can hurt clean recordings.";
 
   label.append(labelText, select, help);
   controls.insertBefore(label, elements.convert);
@@ -336,15 +381,15 @@ function ensureQualityControl() {
 }
 
 function getQualityPreset() {
-  const value = elements.quality?.value || "clean";
-  return ["clean", "balanced", "sensitive"].includes(value) ? value : "clean";
+  const value = elements.quality?.value || "balanced";
+  return ["clean", "balanced", "sensitive"].includes(value) ? value : "balanced";
 }
 
 function setSelectedFile(file) {
   if (!elements.selectedFileName || !elements.selectedFileMeta) return;
   if (!file) {
     elements.selectedFileName.textContent = "-";
-    elements.selectedFileMeta.textContent = `${MAX_AUDIO_MB} MB max`;
+    elements.selectedFileMeta.textContent = `${MAX_AUDIO_MB} MB / ${MAX_AUDIO_SECONDS}s max`;
     return;
   }
 
@@ -413,6 +458,14 @@ function formatBytes(bytes) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function formatElapsed(milliseconds) {
+  const totalSeconds = Math.max(0, Math.round(milliseconds / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes === 0) return `${seconds}s`;
+  return `${minutes}m ${String(seconds).padStart(2, "0")}s`;
 }
 
 function getLanguage() {

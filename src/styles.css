@@ -733,7 +733,7 @@ select {
 .conversion-result {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: 2fr 1fr auto auto;
+  grid-template-columns: 2fr 1fr 1fr auto auto;
   gap: 10px;
   align-items: center;
   border-top: 1px solid var(--line);
