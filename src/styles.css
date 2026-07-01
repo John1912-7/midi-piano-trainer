@@ -815,6 +815,32 @@ select {
   background: rgba(40, 215, 178, 0.16);
 }
 
+.feedback-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  border: 1px solid rgba(40, 215, 178, 0.22);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(40, 215, 178, 0.07);
+}
+
+.feedback-panel h2,
+.feedback-panel p {
+  margin: 0;
+}
+
+.feedback-panel h2 {
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.feedback-panel p:last-child {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
 .conversion-result {
   grid-column: 1 / -1;
   display: grid;
@@ -885,7 +911,8 @@ select {
   }
 
   .converter-panel,
-  .conversion-result {
+  .conversion-result,
+  .feedback-panel {
     grid-template-columns: 1fr;
   }
 

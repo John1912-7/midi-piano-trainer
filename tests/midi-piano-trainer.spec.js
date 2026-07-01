@@ -27,9 +27,15 @@ test("localized public pages do not contain mojibake text", async () => {
     "СЊ",
     "С‹",
     "Г±",
+    "Ф±",
+    "Хё",
     "ХЂ",
     "ХЎ",
+    "Х«",
+    "Х¶",
+    "Ц‚",
     "ЦЂ",
+    "Ц„",
   ];
 
   for (const file of files) {
@@ -195,6 +201,10 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
   await expect(page.locator("#backendUrl")).toBeAttached();
   await expect(page.locator("#audioFile")).toBeAttached();
   await expect(page.locator("#qualityPreset")).toHaveValue("balanced");
+  await expect(page.getByRole("link", { name: /Сообщить|Report bad conversion/ })).toHaveAttribute(
+    "href",
+    /audio-conversion-feedback\.yml/,
+  );
   await expect(page.locator("#checkBackendButton")).toBeEnabled();
   await expect(page.locator("#convertAudioButton")).toBeDisabled();
   await expect(page.locator("#conversionProgress")).toHaveAttribute("value", "0");

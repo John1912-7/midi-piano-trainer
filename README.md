@@ -29,17 +29,24 @@ Supported user flow:
 
 1. User uploads their own MP3, WAV, OGG, FLAC, or M4A file.
 2. User enters a compatible backend API URL.
-3. The page sends the audio file to `POST /convert`.
-4. The backend returns a `.mid` file.
-5. The user downloads the MIDI or opens it in MIDI Piano Trainer.
+3. The page creates a queued conversion job with `POST /jobs`.
+4. The page polls job status, then downloads the finished `.mid` file.
+5. The user downloads the MIDI, opens it in MIDI Piano Trainer, or reports a bad conversion.
 
 Rules:
 
 - Do not download YouTube audio directly.
 - Do not make the backend required for the normal MIDI trainer.
-- Keep the file limit visible. Current MVP limit: 25 MB.
-- Keep the duration limit visible. Current backend MVP limit: 60 seconds.
+- Explain best results and beta constraints without making the page feel like a weak demo.
+- Show technical limits only when the user hits them. Current backend defaults: 25 MB and 60 seconds.
 - Keep the backend URL user-configurable.
+- Keep a visible feedback route for bad conversions and feature requests.
+
+Feedback route:
+
+```text
+https://github.com/John1912-7/midi-piano-trainer/issues/new?template=audio-conversion-feedback.yml
+```
 
 Audio to MIDI pages:
 

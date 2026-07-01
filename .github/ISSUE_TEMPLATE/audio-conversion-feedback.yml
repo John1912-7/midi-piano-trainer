@@ -1,0 +1,68 @@
+name: Audio-to-MIDI conversion feedback
+description: Report a bad conversion result or share a test case for Audio-to-MIDI.
+title: "[Audio-to-MIDI] "
+labels: ["audio-to-midi", "feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing the free Audio-to-MIDI tool. Please share only audio that you own or have permission to use.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the conversion problem in plain language.
+      placeholder: "Example: many notes are missing, timing is late, chords are wrong, extra notes appear..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audio-type
+    attributes:
+      label: What kind of audio did you use?
+      options:
+        - Clean piano
+        - Quiet piano
+        - Noisy/phone piano recording
+        - Guitar or melody instrument
+        - Full mixed song
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: duration
+    attributes:
+      label: Approximate duration
+      placeholder: "Example: 20 seconds"
+
+  - type: dropdown
+    id: quality-profile
+    attributes:
+      label: Quality profile
+      options:
+        - Balanced
+        - Clean
+        - Sensitive
+        - I do not know
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: If you have a reference MIDI or know the correct notes, describe it here.
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Files or links
+      description: Attach the generated MIDI, a short legal audio sample, screenshots, or a reference MIDI if you can share them.
+
+  - type: checkboxes
+    id: permission
+    attributes:
+      label: Permission
+      options:
+        - label: I own the shared audio/files or have permission to share them for debugging.
+          required: true
