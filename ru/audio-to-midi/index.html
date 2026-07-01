@@ -6,7 +6,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="IKltP1oUj7Y3BJdkTE2-DUNCvV29QHhHrTNKxxtqPhs" />
     <title>Бесплатный конвертер аудио в MIDI онлайн | MIDI Piano Trainer</title>
-    <meta name="description" content="Загрузите MP3, WAV, OGG, FLAC или M4A, получите MIDI через optional backend и откройте результат в бесплатном MIDI Piano Trainer." />
+    <meta name="description" content="Загрузите MP3, WAV, OGG, FLAC или M4A, автоматически получите MIDI и откройте результат в бесплатном MIDI Piano Trainer." />
     <link rel="canonical" href="https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/" />
     <link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
     <link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
@@ -34,7 +34,7 @@
         "applicationCategory": "MusicApplication",
         "operatingSystem": "Web",
         "url": "https://john1912-7.github.io/midi-piano-trainer/ru/audio-to-midi/",
-        "description": "Бесплатный браузерный интерфейс для конвертации пользовательских аудиофайлов в MIDI через optional backend.",
+        "description": "Бесплатный браузерный интерфейс для автоматической конвертации пользовательских аудиофайлов в MIDI.",
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
       }
@@ -65,8 +65,8 @@
         <p class="eyebrow">Экспериментальный open-source инструмент</p>
         <h1>Бесплатный конвертер аудио в MIDI</h1>
         <p>
-          Загрузите собственный MP3, WAV, OGG, FLAC или M4A, отправьте его на совместимый backend,
-          скачайте MIDI или сразу откройте результат в тренажере пианино.
+          Загрузите собственный MP3, WAV, OGG, FLAC или M4A, автоматически получите MIDI
+          и сразу откройте результат в тренажере пианино.
         </p>
       </section>
 
@@ -74,13 +74,13 @@
         <div class="converter-copy">
           <h2>Конвертировать аудио</h2>
           <p>
-            Лучше всего подходят короткие чистые записи одного инструмента. Файл отправляется только
-            на backend URL, который вы сами укажете. Лимит MVP: <strong id="audioLimitLabel">25 MB</strong>.
+            Лучше всего подходят короткие чистые записи одного инструмента.
+            Бесплатная beta может занять несколько минут, пока сервис распознает ноты. Лимит MVP: <strong id="audioLimitLabel">25 MB</strong>.
           </p>
         </div>
 
-        <label class="backend-url-control">
-          <span>Backend API URL</span>
+        <label class="backend-url-control" hidden>
+          <span>Advanced conversion service</span>
           <input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" />
         </label>
 
@@ -95,7 +95,7 @@
             <input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" />
             <span>Выбрать аудио</span>
           </label>
-          <button id="checkBackendButton" type="button" disabled>Проверить backend</button>
+          <button id="checkBackendButton" type="button" disabled hidden>Проверить сервис</button>
           <button id="convertAudioButton" type="button" disabled>Сделать MIDI</button>
         </div>
 
@@ -120,12 +120,12 @@
 
       <section class="planning-grid" aria-label="Как работает инструмент">
         <article>
-          <h2>1. Укажите backend</h2>
-          <p>Backend остается optional: тренажер MIDI работает без него, а конвертация аудио использует ваш API URL.</p>
+          <h2>1. Выберите аудио</h2>
+          <p>Используйте короткую запись, которая принадлежит вам или которую вам разрешено обрабатывать. Чистое пианино и один инструмент работают лучше всего.</p>
         </article>
         <article>
-          <h2>2. Загрузите свой файл</h2>
-          <p>Сайт не скачивает YouTube и не обходит платные сервисы. Пользователь загружает только свой аудиофайл.</p>
+          <h2>2. Дождитесь конвертации</h2>
+          <p>Сайт не скачивает YouTube и не обходит платные сервисы. Распознавание может занять несколько минут на бесплатной инфраструктуре.</p>
         </article>
         <article>
           <h2>3. Откройте MIDI</h2>
@@ -144,7 +144,7 @@
 
       <section class="decision-panel">
         <h2>FAQ</h2>
-        <p><strong>Почему нужен backend?</strong> Распознавание нот тяжелее обычной статической страницы, поэтому GitHub Pages сам не может выполнить AI-конвертацию.</p>
+        <p><strong>Почему конвертация может идти долго?</strong> Распознавание нот тяжелее обычной страницы, поэтому бесплатная beta обрабатывает тяжелые задачи по очереди.</p>
         <p><strong>Какие файлы лучше?</strong> Короткие записи пианино, гитары или отдельной мелодии дают лучший результат, чем полный микс песни.</p>
       </section>
     </main>

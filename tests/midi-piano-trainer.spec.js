@@ -2,6 +2,8 @@ import { expect, test } from "@playwright/test";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+const DEFAULT_BACKEND_URL = "https://vanya1912-midi-piano-trainer-backend.hf.space";
+
 test("localized public pages do not contain mojibake text", async () => {
   const files = [
     "ru/index.html",
@@ -183,7 +185,7 @@ test("warns when the selected notes are wider than the PC keyboard range", async
   await expect(page.locator("#octaveLabel")).toHaveText(/C[34]-E[56]/);
 });
 
-test("opens the audio-to-midi page and checks backend health", async ({ page }) => {
+test("opens the public audio-to-midi page with automatic conversion service", async ({ page }) => {
   const errors = [];
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
@@ -199,29 +201,17 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
   await expect(page.locator(".site-tabs a.active")).toHaveAttribute("href", "./");
   await expect(page.getByRole("heading", { name: "Бесплатный конвертер аудио в MIDI" })).toBeVisible();
   await expect(page.locator("#backendUrl")).toBeAttached();
+  await expect(page.locator("#backendUrl")).toBeHidden();
   await expect(page.locator("#audioFile")).toBeAttached();
   await expect(page.locator("#qualityPreset")).toHaveValue("balanced");
   await expect(page.getByRole("link", { name: /Сообщить|Report bad conversion/ })).toHaveAttribute(
     "href",
     /audio-conversion-feedback\.yml/,
   );
-  await expect(page.locator("#checkBackendButton")).toBeEnabled();
+  await expect(page.locator("#checkBackendButton")).toBeHidden();
   await expect(page.locator("#convertAudioButton")).toBeDisabled();
   await expect(page.locator("#conversionProgress")).toHaveAttribute("value", "0");
   await expect(page.locator("#conversionStatus")).toContainText("Выберите аудиофайл");
-
-  await page.route("http://127.0.0.1:7860/health", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ ok: true }),
-    });
-  });
-
-  await page.locator("#backendUrl").fill("http://127.0.0.1:7860");
-  await expect(page.locator("#checkBackendButton")).toBeEnabled();
-  await page.locator("#checkBackendButton").click();
-  await expect(page.locator("#conversionStatus")).toContainText("Backend доступен");
 
   await page.locator("#audioFile").setInputFiles({
     name: "test-tone.wav",
@@ -238,7 +228,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   const midi = createMidiFile([60, 64, 67]);
   let jobBody = "";
 
-  await page.route("http://127.0.0.1:7860/health", async (route) => {
+  await page.route(`${DEFAULT_BACKEND_URL}/health`, async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -246,7 +236,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
     });
   });
 
-  await page.route("http://127.0.0.1:7860/jobs", async (route) => {
+  await page.route(`${DEFAULT_BACKEND_URL}/jobs`, async (route) => {
     jobBody = route.request().postDataBuffer()?.toString("utf8") || "";
     await route.fulfill({
       status: 202,
@@ -260,7 +250,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
     });
   });
 
-  await page.route("http://127.0.0.1:7860/jobs/job-1", async (route) => {
+  await page.route(`${DEFAULT_BACKEND_URL}/jobs/job-1`, async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -277,7 +267,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
     });
   });
 
-  await page.route("http://127.0.0.1:7860/jobs/job-1/midi", async (route) => {
+  await page.route(`${DEFAULT_BACKEND_URL}/jobs/job-1/midi`, async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "audio/midi",
@@ -294,7 +284,6 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   });
 
   await page.goto("/ru/audio-to-midi/");
-  await page.locator("#backendUrl").fill("http://127.0.0.1:7860");
   await page.locator("#qualityPreset").selectOption("balanced");
   await page.locator("#audioFile").setInputFiles({
     name: "test-tone.wav",

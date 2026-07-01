@@ -24,6 +24,8 @@ MIDI Piano Trainer lets users upload `.mid` files in the browser, follow falling
 
 Audio-to-MIDI is an experimental MVP. It accepts user-uploaded audio, sends it to an optional backend, returns a MIDI file, and can open the result in the trainer.
 
+Public users should not choose or think about the backend. The public Audio-to-MIDI page must use the official hosted backend automatically. Manual backend URL selection is allowed only for advanced/debug workflows, benchmark development, or local testing, for example through `?advanced=1`.
+
 Quality work should use legal reference MIDI files. A reference can come from a user's own manual transcription, DAW export, notation app, or a service export the user is allowed to use. Do not automate private paid services or bypass limits. Use `npm run benchmark:audio -- audio.wav reference.mid` to test our backend presets against the same reference.
 
 Current audio-to-MIDI engine decision:
@@ -38,6 +40,7 @@ Current audio-to-MIDI engine decision:
 ## Rules
 
 - Do not make backend required for the trainer.
+- Do not expose backend URL selection in the normal public Audio-to-MIDI UI.
 - Do not download YouTube audio directly.
 - Do not automate paid/private transcription services without an official allowed API.
 - Do not place ads near upload, play, convert, editor, or download controls.

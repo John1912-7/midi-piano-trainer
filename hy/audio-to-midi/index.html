@@ -6,7 +6,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="IKltP1oUj7Y3BJdkTE2-DUNCvV29QHhHrTNKxxtqPhs" />
     <title>Աուդիոից MIDI անվճար փոխարկիչ | MIDI Piano Trainer</title>
-    <meta name="description" content="Բեռնեք MP3, WAV, OGG, FLAC կամ M4A, ստացեք MIDI optional backend-ի միջոցով և բացեք արդյունքը MIDI Piano Trainer-ում:" />
+    <meta name="description" content="Բեռնեք MP3, WAV, OGG, FLAC կամ M4A, ավտոմատ ստացեք MIDI և բացեք արդյունքը MIDI Piano Trainer-ում:" />
     <link rel="canonical" href="https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/" />
     <link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
     <link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
@@ -26,7 +26,7 @@
     <script>window.GA_MEASUREMENT_ID = "G-EFDCRJY776";</script>
     <script src="../../src/analytics.js" defer></script>
     <link rel="stylesheet" href="../../src/styles.css" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Audio to MIDI Converter","applicationCategory":"MusicApplication","operatingSystem":"Web","url":"https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/","description":"Անվճար բրաուզերային ինտերֆեյս սեփական աուդիո ֆայլերը MIDI-ի փոխարկելու համար optional backend-ի միջոցով:","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Audio to MIDI Converter","applicationCategory":"MusicApplication","operatingSystem":"Web","url":"https://john1912-7.github.io/midi-piano-trainer/hy/audio-to-midi/","description":"Անվճար բրաուզերային ինտերֆեյս սեփական աուդիո ֆայլերը MIDI-ի ավտոմատ փոխարկելու համար:","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
   </head>
   <body>
     <main class="app planning-page">
@@ -50,15 +50,15 @@
       <section class="planning-hero audio-hero">
         <p class="eyebrow">Փորձնական open-source գործիք</p>
         <h1>Աուդիոից MIDI անվճար փոխարկիչ</h1>
-        <p>Բեռնեք ձեր սեփական MP3, WAV, OGG, FLAC կամ M4A ֆայլը, ուղարկեք համատեղելի backend և բացեք MIDI-ն դաշնամուրի վարժարանում:</p>
+        <p>Բեռնեք ձեր սեփական MP3, WAV, OGG, FLAC կամ M4A ֆայլը, ստեղծեք MIDI ավտոմատ կերպով և բացեք արդյունքը դաշնամուրի վարժարանում:</p>
       </section>
       <section class="converter-panel" aria-label="Աուդիոից MIDI փոխարկիչ">
         <div class="converter-copy">
           <h2>Փոխարկել աուդիոն</h2>
-          <p>Լավագույն արդյունքը տալիս են կարճ և մաքուր մեկ գործիքի ձայնագրությունները։ Ֆայլը ուղարկվում է միայն ձեր նշած backend URL-ին։</p>
+          <p>Լավագույն արդյունքը տալիս են կարճ և մաքուր մեկ գործիքի ձայնագրությունները։ Անվճար beta-ն կարող է մի քանի րոպե տևել, մինչ նոտաները ճանաչվում են։</p>
         </div>
-        <label class="backend-url-control">
-          <span>Backend API URL</span>
+        <label class="backend-url-control" hidden>
+          <span>Advanced conversion service</span>
           <input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" />
         </label>
         <div class="selected-file-card" aria-label="Ընտրված ֆայլ">
@@ -71,7 +71,7 @@
             <input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" />
             <span>Ընտրել աուդիո</span>
           </label>
-          <button id="checkBackendButton" type="button" disabled>Ստուգել backend-ը</button>
+          <button id="checkBackendButton" type="button" disabled hidden>Ստուգել ծառայությունը</button>
           <button id="convertAudioButton" type="button" disabled>Ստեղծել MIDI</button>
         </div>
         <div class="conversion-state">
@@ -86,8 +86,8 @@
         </div>
       </section>
       <section class="planning-grid" aria-label="Ինչպես է աշխատում">
-        <article><h2>1. Նշեք backend</h2><p>MIDI վարժարանը աշխատում է առանց backend-ի. աուդիո փոխարկման համար պետք է միայն API URL:</p></article>
-        <article><h2>2. Բեռնեք ձեր ֆայլը</h2><p>Կայքը չի ներբեռնում YouTube աուդիո և չի շրջանցում վճարովի ծառայություններ:</p></article>
+        <article><h2>1. Ընտրեք աուդիո</h2><p>Օգտագործեք կարճ ձայնագրություն, որը ձերն է կամ որը թույլատրված է մշակել։ Մաքուր դաշնամուրը և մեկ գործիքը լավագույնն են աշխատում։</p></article>
+        <article><h2>2. Սպասեք փոխարկմանը</h2><p>Կայքը չի ներբեռնում YouTube աուդիո և չի շրջանցում վճարովի ծառայություններ։ Նոտաների ճանաչումը կարող է մի քանի րոպե տևել անվճար ենթակառուցվածքում։</p></article>
         <article><h2>3. Վարժվեք MIDI-ով</h2><p>Ներբեռնեք `.mid` ֆայլը կամ բացեք այն MIDI Piano Trainer-ում:</p></article>
       </section>
       <section class="feedback-panel" aria-label="Աուդիո փոխարկման feedback">
@@ -100,7 +100,7 @@
       </section>
       <section class="decision-panel">
         <h2>FAQ</h2>
-        <p><strong>Ինչու՞ է պետք backend:</strong> Նոտաների ճանաչումը ծանր է GitHub Pages-ի նման ստատիկ էջի համար:</p>
+        <p><strong>Ինչու՞ փոխարկումը կարող է երկար տևել:</strong> Նոտաների ճանաչումը սովորական էջից ծանր է, ուստի անվճար beta-ն ծանր առաջադրանքները մշակում է հերթով:</p>
         <p><strong>Ո՞ր աուդիոն է լավագույնը:</strong> Կարճ դաշնամուրի, կիթառի կամ առանձին մեղեդու ձայնագրությունները ավելի լավ են, քան ամբողջական երգերի խառնուրդները:</p>
       </section>
     </main>

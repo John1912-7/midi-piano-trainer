@@ -8,115 +8,116 @@ const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
 const QUALITY_PRESET_KEY = "midiPianoTrainerAudioQuality";
 const DEFAULT_BACKEND_URL = "https://vanya1912-midi-piano-trainer-backend.hf.space";
+const ADVANCED_BACKEND_PARAM = "advanced";
 
 const copy = {
   ru: {
     chooseFile: "Выберите аудиофайл.",
-    backendRequired: "Укажите URL backend API.",
-    checking: "Проверяю backend...",
+    backendRequired: "Сервис конвертации временно недоступен.",
+    checking: "Проверяю сервис конвертации...",
     checkBackend: "Проверить backend",
     convertIdle: "Сделать MIDI",
     converting: "Конвертация...",
-    backendReady: "Backend доступен. Можно конвертировать аудио.",
-    backendError: "Backend не отвечает.",
+    backendReady: "Сервис конвертации доступен. Можно конвертировать аудио.",
+    backendError: "Сервис конвертации не отвечает.",
     fileTooLarge: (limit) => `Файл слишком большой для MVP. Ограничение: ${limit} MB.`,
     fileSelected: (name) => `Файл выбран: ${name}`,
-    sending: "Отправляю аудио на backend...",
-    backendStatus: (status) => `Backend вернул ошибку ${status}.`,
+    sending: "Загружаю аудио для конвертации...",
+    backendStatus: (status) => `Сервис конвертации вернул ошибку ${status}.`,
     receiving: "Получаю MIDI...",
     ready: "MIDI готов. Можно скачать или открыть в тренажере.",
     failed: "Не удалось получить MIDI.",
     handoffFailed:
       "Не удалось передать MIDI в тренажер. Скачайте MIDI и загрузите его вручную.",
     sleeping:
-      "Backend долго не отвечает. Проверьте URL или подождите, пока бесплатный сервер проснется.",
+      "Сервис конвертации долго не отвечает. Подождите, пока бесплатный сервер проснется.",
   },
   hy: {
     chooseFile: "Ընտրեք աուդիո ֆայլ:",
-    backendRequired: "Նշեք backend API URL-ը:",
-    checking: "Ստուգում եմ backend-ը...",
+    backendRequired: "Փոխարկման ծառայությունը ժամանակավորապես հասանելի չէ:",
+    checking: "Ստուգում եմ փոխարկման ծառայությունը...",
     checkBackend: "Ստուգել backend-ը",
     convertIdle: "Ստեղծել MIDI",
     converting: "Փոխարկում...",
-    backendReady: "Backend-ը հասանելի է։ Կարելի է փոխարկել աուդիոն:",
-    backendError: "Backend-ը չի պատասխանում:",
+    backendReady: "Փոխարկման ծառայությունը հասանելի է։ Կարելի է փոխարկել աուդիոն:",
+    backendError: "Փոխարկման ծառայությունը չի պատասխանում:",
     fileTooLarge: (limit) => `Ֆայլը շատ մեծ է MVP-ի համար։ Սահմանափակում՝ ${limit} MB։`,
     fileSelected: (name) => `Ընտրված ֆայլ՝ ${name}`,
-    sending: "Ուղարկում եմ աուդիոն backend...",
-    backendStatus: (status) => `Backend-ը վերադարձրել է սխալ ${status}։`,
+    sending: "Բեռնում եմ աուդիոն փոխարկման համար...",
+    backendStatus: (status) => `Փոխարկման ծառայությունը վերադարձրել է սխալ ${status}։`,
     receiving: "Ստանում եմ MIDI...",
     ready: "MIDI-ն պատրաստ է։ Կարող եք ներբեռնել կամ բացել վարժարանում:",
     failed: "Չհաջողվեց ստանալ MIDI:",
     handoffFailed:
       "Չհաջողվեց փոխանցել MIDI-ն վարժարան։ Ներբեռնեք MIDI-ն և բեռնեք ձեռքով:",
     sleeping:
-      "Backend-ը երկար չի պատասխանում։ Ստուգեք URL-ը կամ սպասեք, մինչև անվճար սերվերը արթնանա:",
+      "Փոխարկման ծառայությունը երկար չի պատասխանում։ Սպասեք, մինչև անվճար սերվերը արթնանա:",
   },
   de: {
     chooseFile: "Waehle eine Audiodatei.",
-    backendRequired: "Gib die Backend-API-URL ein.",
-    checking: "Backend wird geprueft...",
+    backendRequired: "Der Konvertierungsdienst ist gerade nicht erreichbar.",
+    checking: "Konvertierungsdienst wird geprueft...",
     checkBackend: "Backend pruefen",
     convertIdle: "MIDI erstellen",
     converting: "Konvertierung...",
-    backendReady: "Backend ist erreichbar. Audio kann konvertiert werden.",
-    backendError: "Backend antwortet nicht.",
+    backendReady: "Konvertierungsdienst ist erreichbar. Audio kann konvertiert werden.",
+    backendError: "Konvertierungsdienst antwortet nicht.",
     fileTooLarge: (limit) => `Die Datei ist fuer dieses MVP zu gross. Limit: ${limit} MB.`,
     fileSelected: (name) => `Datei gewaehlt: ${name}`,
-    sending: "Audio wird an das Backend gesendet...",
-    backendStatus: (status) => `Backend meldet Fehler ${status}.`,
+    sending: "Audio wird fuer die Konvertierung hochgeladen...",
+    backendStatus: (status) => `Konvertierungsdienst meldet Fehler ${status}.`,
     receiving: "MIDI wird empfangen...",
     ready: "MIDI ist fertig. Du kannst es herunterladen oder im Trainer oeffnen.",
     failed: "MIDI konnte nicht erstellt werden.",
     handoffFailed:
       "MIDI konnte nicht an den Trainer uebergeben werden. Lade die MIDI-Datei herunter und importiere sie manuell.",
     sleeping:
-      "Backend antwortet sehr langsam. Pruefe die URL oder warte, bis der kostenlose Server aufwacht.",
+      "Der Konvertierungsdienst antwortet sehr langsam. Warte, bis der kostenlose Server aufwacht.",
   },
   es: {
     chooseFile: "Elige un archivo de audio.",
-    backendRequired: "Introduce la URL de la API backend.",
-    checking: "Comprobando backend...",
+    backendRequired: "El servicio de conversion no esta disponible ahora.",
+    checking: "Comprobando el servicio de conversion...",
     checkBackend: "Comprobar backend",
     convertIdle: "Crear MIDI",
     converting: "Convirtiendo...",
-    backendReady: "El backend esta disponible. Puedes convertir el audio.",
-    backendError: "El backend no responde.",
+    backendReady: "El servicio de conversion esta disponible. Puedes convertir el audio.",
+    backendError: "El servicio de conversion no responde.",
     fileTooLarge: (limit) => `El archivo es demasiado grande para este MVP. Limite: ${limit} MB.`,
     fileSelected: (name) => `Archivo elegido: ${name}`,
-    sending: "Enviando audio al backend...",
-    backendStatus: (status) => `El backend devolvio el error ${status}.`,
+    sending: "Subiendo audio para convertirlo...",
+    backendStatus: (status) => `El servicio de conversion devolvio el error ${status}.`,
     receiving: "Recibiendo MIDI...",
     ready: "MIDI listo. Puedes descargarlo o abrirlo en el entrenador.",
     failed: "No se pudo obtener el MIDI.",
     handoffFailed:
       "No se pudo pasar el MIDI al entrenador. Descarga el MIDI y cargalo manualmente.",
     sleeping:
-      "El backend tarda demasiado en responder. Comprueba la URL o espera a que el servidor gratuito despierte.",
+      "El servicio de conversion tarda demasiado en responder. Espera a que el servidor gratuito despierte.",
     longRunning:
       "High-quality Transkun conversion can take several minutes on free servers.",
     stillWorking: (elapsed) => `Still converting with Transkun... elapsed ${elapsed}.`,
   },
   en: {
     chooseFile: "Choose an audio file.",
-    backendRequired: "Enter the backend API URL.",
-    checking: "Checking backend...",
+    backendRequired: "The conversion service is temporarily unavailable.",
+    checking: "Checking conversion service...",
     checkBackend: "Check backend",
     convertIdle: "Create MIDI",
     converting: "Converting...",
-    backendReady: "Backend is reachable. You can convert audio now.",
-    backendError: "Backend is not responding.",
+    backendReady: "Conversion service is reachable. You can convert audio now.",
+    backendError: "Conversion service is not responding.",
     fileTooLarge: (limit) => `The file is too large for this MVP. Limit: ${limit} MB.`,
     fileSelected: (name) => `File selected: ${name}`,
-    sending: "Sending audio to backend...",
-    backendStatus: (status) => `Backend returned error ${status}.`,
+    sending: "Uploading audio for conversion...",
+    backendStatus: (status) => `Conversion service returned error ${status}.`,
     receiving: "Receiving MIDI...",
     ready: "MIDI is ready. Download it or open it in the trainer.",
     failed: "Could not create MIDI.",
     handoffFailed:
       "Could not pass the MIDI to the trainer. Download the MIDI and upload it manually.",
     sleeping:
-      "Backend is taking too long to respond. Check the URL or wait while the free server wakes up.",
+      "Conversion service is taking too long to respond. Wait while the free server wakes up.",
     longRunning:
       "High-quality Transkun conversion can take several minutes on free servers.",
     stillWorking: (elapsed) => `Still converting with Transkun... elapsed ${elapsed}.`,
@@ -144,6 +145,7 @@ const elements = {
 
 const language = getLanguage();
 const text = copy[language] || copy.en;
+const isAdvancedBackendMode = new URLSearchParams(window.location.search).get(ADVANCED_BACKEND_PARAM) === "1";
 
 let selectedFile = null;
 let selectedAudioDuration = 0;
@@ -159,7 +161,7 @@ let jobPanel = null;
 
 ensureQualityControl();
 ensureJobPanel();
-elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || DEFAULT_BACKEND_URL;
+configureBackendControls();
 if (elements.quality) elements.quality.value = localStorage.getItem(QUALITY_PRESET_KEY) || "balanced";
 if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB / ${MAX_AUDIO_SECONDS}s`;
 if (elements.languageSelect) elements.languageSelect.value = language;
@@ -170,7 +172,8 @@ elements.languageSelect?.addEventListener("change", () => {
   window.location.href = languageAudioUrl(elements.languageSelect.value);
 });
 
-elements.backendUrl.addEventListener("input", () => {
+elements.backendUrl?.addEventListener("input", () => {
+  if (!isAdvancedBackendMode) return;
   localStorage.setItem(BACKEND_URL_KEY, elements.backendUrl.value.trim());
   updateConvertState();
 });
@@ -179,8 +182,8 @@ elements.quality?.addEventListener("change", () => {
   localStorage.setItem(QUALITY_PRESET_KEY, getQualityPreset());
 });
 
-elements.checkBackend.addEventListener("click", async () => {
-  const backendUrl = normalizeBackendUrl(elements.backendUrl.value);
+elements.checkBackend?.addEventListener("click", async () => {
+  const backendUrl = getBackendUrl();
   if (!backendUrl) {
     setStatus(text.backendRequired);
     return;
@@ -225,7 +228,7 @@ elements.file.addEventListener("change", () => {
 elements.convert.addEventListener("click", async () => {
   if (!selectedFile) return;
 
-  const backendUrl = normalizeBackendUrl(elements.backendUrl.value);
+  const backendUrl = getBackendUrl();
   if (!backendUrl) {
     setStatus(text.backendRequired);
     return;
@@ -238,7 +241,7 @@ elements.convert.addEventListener("click", async () => {
     setProgress(8);
     updateJobPanel({
       status: "uploading",
-      message: `Uploading your audio to the backend. ${formatEstimateMessage()}`,
+      message: `Uploading your audio for conversion. ${formatEstimateMessage()}`,
       progress: 8,
       jobId: "",
       canStop: true,
@@ -253,7 +256,7 @@ elements.convert.addEventListener("click", async () => {
     } else {
       updateJobPanel({
         status: "processing",
-        message: `Backend does not support queue yet. Converting directly. ${formatEstimateMessage()}`,
+        message: `Conversion queue is not available yet. Converting directly. ${formatEstimateMessage()}`,
         progress: 30,
         canStop: true,
       });
@@ -286,7 +289,7 @@ elements.convert.addEventListener("click", async () => {
       setStatus("Stopped waiting. You can start a new conversion when ready.");
       updateJobPanel({
         status: "stopped",
-        message: "Stopped waiting in this browser. The backend task may still finish in the background.",
+        message: "Stopped waiting in this browser. The conversion task may still finish in the background.",
         progress: 0,
         canStop: false,
         canRetry: Boolean(selectedFile),
@@ -327,10 +330,10 @@ elements.openTrainer.addEventListener("click", () => {
 });
 
 function updateConvertState() {
-  const hasBackend = Boolean(normalizeBackendUrl(elements.backendUrl.value));
+  const hasBackend = Boolean(getBackendUrl());
   const hasValidFile = selectedFile && selectedFile.size <= MAX_AUDIO_MB * 1024 * 1024;
   elements.convert.disabled = !hasBackend || !hasValidFile;
-  elements.checkBackend.disabled = !hasBackend;
+  if (elements.checkBackend) elements.checkBackend.disabled = !hasBackend;
 }
 
 function showResult(noteCount, engine, preprocess) {
@@ -372,13 +375,32 @@ function showEngineName(engine, preprocess) {
 }
 
 function setBusy(isBusy, checkLabel = text.checkBackend, convertLabel = text.converting) {
-  elements.backendUrl.disabled = isBusy;
+  const hasValidFile = selectedFile && selectedFile.size <= MAX_AUDIO_MB * 1024 * 1024;
+  if (elements.backendUrl) elements.backendUrl.disabled = isBusy || !isAdvancedBackendMode;
   elements.file.disabled = isBusy;
   if (elements.quality) elements.quality.disabled = isBusy;
-  elements.checkBackend.disabled = isBusy || !normalizeBackendUrl(elements.backendUrl.value);
-  elements.convert.disabled = isBusy || !selectedFile;
-  elements.checkBackend.textContent = isBusy ? checkLabel : text.checkBackend;
+  if (elements.checkBackend) elements.checkBackend.disabled = isBusy || !getBackendUrl();
+  elements.convert.disabled = isBusy || !hasValidFile;
+  if (elements.checkBackend) elements.checkBackend.textContent = isBusy ? checkLabel : text.checkBackend;
   elements.convert.textContent = isBusy ? convertLabel : text.convertIdle;
+}
+
+function configureBackendControls() {
+  if (!elements.backendUrl) return;
+
+  elements.backendUrl.value = isAdvancedBackendMode
+    ? localStorage.getItem(BACKEND_URL_KEY) || DEFAULT_BACKEND_URL
+    : DEFAULT_BACKEND_URL;
+  elements.backendUrl.disabled = !isAdvancedBackendMode;
+
+  const backendControl = elements.backendUrl.closest(".backend-url-control");
+  if (backendControl) backendControl.hidden = !isAdvancedBackendMode;
+  if (elements.checkBackend) elements.checkBackend.hidden = !isAdvancedBackendMode;
+}
+
+function getBackendUrl() {
+  if (!isAdvancedBackendMode) return DEFAULT_BACKEND_URL;
+  return normalizeBackendUrl(elements.backendUrl?.value || DEFAULT_BACKEND_URL);
 }
 
 function startConversionTimer() {
@@ -604,7 +626,7 @@ function ensureJobPanel() {
     setStatus("Stopped waiting. You can start a new conversion when ready.");
     updateJobPanel({
       status: "stopped",
-      message: "Stopped waiting in this browser. The backend task may still finish in the background.",
+      message: "Stopped waiting in this browser. The conversion task may still finish in the background.",
       canStop: false,
       canRetry: Boolean(selectedFile),
     });
@@ -720,7 +742,7 @@ function formatEstimateMeta(status) {
   const remainingLower = Math.max(0, activeEstimate.lower - elapsedSeconds);
   const remainingUpper = Math.max(0, activeEstimate.upper - elapsedSeconds);
   if (remainingUpper === 0) {
-    return "Taking longer than usual. The free backend may still be working.";
+    return "Taking longer than usual. The free server may still be working.";
   }
   const prefix = activeEstimate.source === "duration" ? "Approx remaining" : "Rough remaining";
   return `${prefix}: ${formatDurationRange(remainingLower, remainingUpper)}`;

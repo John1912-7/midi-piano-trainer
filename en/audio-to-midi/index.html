@@ -6,7 +6,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="google-site-verification" content="IKltP1oUj7Y3BJdkTE2-DUNCvV29QHhHrTNKxxtqPhs" />
     <title>Free Audio to MIDI Converter Online | MIDI Piano Trainer</title>
-    <meta name="description" content="Upload MP3, WAV, OGG, FLAC or M4A, convert it to MIDI through an optional backend, then download the MIDI or open it in MIDI Piano Trainer." />
+    <meta name="description" content="Upload MP3, WAV, OGG, FLAC or M4A, create a MIDI file automatically, then download it or open it in MIDI Piano Trainer." />
     <link rel="canonical" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
     <link rel="alternate" hreflang="x-default" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
     <link rel="alternate" hreflang="en" href="https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/" />
@@ -26,7 +26,7 @@
     <script>window.GA_MEASUREMENT_ID = "G-EFDCRJY776";</script>
     <script src="../../src/analytics.js" defer></script>
     <link rel="stylesheet" href="../../src/styles.css" />
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Audio to MIDI Converter","applicationCategory":"MusicApplication","operatingSystem":"Web","url":"https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/","description":"A free browser interface for converting user-provided audio files to MIDI through an optional backend.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Audio to MIDI Converter","applicationCategory":"MusicApplication","operatingSystem":"Web","url":"https://john1912-7.github.io/midi-piano-trainer/en/audio-to-midi/","description":"A free browser interface for converting user-provided audio files to MIDI automatically.","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
   </head>
   <body>
     <main class="app planning-page">
@@ -50,14 +50,14 @@
       <section class="planning-hero audio-hero">
         <p class="eyebrow">Experimental open-source tool</p>
         <h1>Free Audio to MIDI Converter</h1>
-        <p>Upload your own MP3, WAV, OGG, FLAC or M4A, send it to a compatible backend, then download the MIDI or open it in the piano trainer.</p>
+        <p>Upload your own MP3, WAV, OGG, FLAC or M4A, create a MIDI file automatically, then download it or open it in the piano trainer.</p>
       </section>
       <section class="converter-panel" aria-label="Audio to MIDI converter">
         <div class="converter-copy">
           <h2>Convert audio</h2>
-          <p>Short clean single-instrument recordings work best. The file is sent only to the backend URL you enter. MVP limit: <strong id="audioLimitLabel">25 MB</strong>.</p>
+          <p>Short clean single-instrument recordings work best. The free beta can take a few minutes while it detects notes. MVP limit: <strong id="audioLimitLabel">25 MB</strong>.</p>
         </div>
-        <label class="backend-url-control">
+        <label class="backend-url-control" hidden>
           <span>Backend API URL</span>
           <input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" />
         </label>
@@ -68,7 +68,7 @@
         </div>
         <div class="converter-controls">
           <label class="file-button audio-file-button"><input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" /><span>Choose audio</span></label>
-          <button id="checkBackendButton" type="button" disabled>Check backend</button>
+          <button id="checkBackendButton" type="button" disabled hidden>Check backend</button>
           <button id="convertAudioButton" type="button" disabled>Create MIDI</button>
         </div>
         <div class="conversion-state">
@@ -83,8 +83,8 @@
         </div>
       </section>
       <section class="planning-grid" aria-label="How it works">
-        <article><h2>1. Add a backend</h2><p>The backend is optional for the main trainer; only audio conversion needs your API URL.</p></article>
-        <article><h2>2. Upload your file</h2><p>The site does not download YouTube audio or bypass paid services. Use audio you own or have permission to process.</p></article>
+        <article><h2>1. Choose audio</h2><p>Use a short recording you own or have permission to process. Piano and clean single-instrument audio works best.</p></article>
+        <article><h2>2. Wait for conversion</h2><p>The site does not download YouTube audio or bypass paid services. Detection can take a few minutes on free infrastructure.</p></article>
         <article><h2>3. Practice the MIDI</h2><p>Download the `.mid` file or open it directly in MIDI Piano Trainer.</p></article>
       </section>
       <section class="feedback-panel" aria-label="Audio conversion feedback">
@@ -97,7 +97,7 @@
       </section>
       <section class="decision-panel">
         <h2>FAQ</h2>
-        <p><strong>Why does this need a backend?</strong> Note detection is heavier than a static GitHub Pages site, so the AI conversion runs on a compatible API.</p>
+        <p><strong>Why can conversion take a while?</strong> Note detection is heavier than a normal web page, so the free beta processes one heavy conversion at a time.</p>
         <p><strong>What audio works best?</strong> Short piano, guitar, or melody recordings work better than full mixed songs.</p>
       </section>
     </main>

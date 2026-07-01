@@ -25,10 +25,10 @@ Before major changes, read `PROJECT_PLAN_FOR_CODEX.md`.
 
 Audio to MIDI is a working MVP page, not a built-in GitHub Pages backend.
 
-Supported user flow:
+Supported public user flow:
 
 1. User uploads their own MP3, WAV, OGG, FLAC, or M4A file.
-2. User enters a compatible backend API URL.
+2. The page uses the official hosted conversion backend automatically.
 3. The page creates a queued conversion job with `POST /jobs`.
 4. The page polls job status, then downloads the finished `.mid` file.
 5. The user downloads the MIDI, opens it in MIDI Piano Trainer, or reports a bad conversion.
@@ -39,7 +39,8 @@ Rules:
 - Do not make the backend required for the normal MIDI trainer.
 - Explain best results and beta constraints without making the page feel like a weak demo.
 - Show technical limits only when the user hits them. Current backend defaults: 25 MB and 60 seconds.
-- Keep the backend URL user-configurable.
+- Do not expose backend URL selection in the normal public UI.
+- Keep manual backend URL selection only for advanced/debug/local testing through `?advanced=1`.
 - Keep a visible feedback route for bad conversions and feature requests.
 
 Feedback route:
@@ -184,7 +185,7 @@ docker build -t midi-piano-backend .
 docker run --rm -p 7860:7860 midi-piano-backend
 ```
 
-Then use this backend URL on the Audio to MIDI page:
+Then open the Audio to MIDI page with `?advanced=1` and use this backend URL for local testing:
 
 ```text
 http://127.0.0.1:7860
