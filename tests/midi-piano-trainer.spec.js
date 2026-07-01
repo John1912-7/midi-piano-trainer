@@ -1,6 +1,44 @@
 import { expect, test } from "@playwright/test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+
+test("localized public pages do not contain mojibake text", async () => {
+  const files = [
+    "ru/index.html",
+    "ru/audio-to-midi/index.html",
+    "hy/index.html",
+    "hy/audio-to-midi/index.html",
+    "en/audio-to-midi/index.html",
+    "de/audio-to-midi/index.html",
+    "es/audio-to-midi/index.html",
+    "src/audioToMidiApp.js",
+    "src/i18n.js",
+  ];
+  const mojibakePatterns = [
+    "Р‘",
+    "Р’",
+    "Р—",
+    "Рљ",
+    "Рџ",
+    "РЎ",
+    "Р ",
+    "СЃ",
+    "С‚",
+    "СЊ",
+    "С‹",
+    "Г±",
+    "ХЂ",
+    "ХЎ",
+    "ЦЂ",
+  ];
+
+  for (const file of files) {
+    const text = readFileSync(resolve(file), "utf8");
+    for (const pattern of mojibakePatterns) {
+      expect(text, `${file} contains mojibake pattern ${pattern}`).not.toContain(pattern);
+    }
+  }
+});
 
 test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ page }) => {
   const consoleErrors = [];
