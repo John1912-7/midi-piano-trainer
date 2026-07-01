@@ -1,6 +1,7 @@
 const MAX_AUDIO_MB = 25;
 const MAX_AUDIO_SECONDS = 60;
 const JOB_POLL_MS = 3000;
+const STOPPED_WAITING_MESSAGE = "Stopped waiting for this task.";
 const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
 const QUALITY_PRESET_KEY = "midiPianoTrainerAudioQuality";
@@ -147,8 +148,13 @@ let generatedMidiBytes = null;
 let generatedMidiName = "converted.mid";
 let resultUrl = "";
 let conversionTimer = 0;
+let activeRunId = 0;
+let activeJobId = "";
+let elapsedStartedAt = 0;
+let jobPanel = null;
 
 ensureQualityControl();
+ensureJobPanel();
 elements.backendUrl.value = localStorage.getItem(BACKEND_URL_KEY) || DEFAULT_BACKEND_URL;
 if (elements.quality) elements.quality.value = localStorage.getItem(QUALITY_PRESET_KEY) || "balanced";
 if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB / ${MAX_AUDIO_SECONDS}s`;
@@ -220,15 +226,30 @@ elements.convert.addEventListener("click", async () => {
   }
 
   try {
+    const runId = ++activeRunId;
     setBusy(true);
     setProgress(8);
+    updateJobPanel({
+      status: "uploading",
+      message: "Uploading your audio to the backend.",
+      progress: 8,
+      jobId: "",
+      canStop: true,
+      canRetry: false,
+    });
     startConversionTimer();
     setStatus(`${text.sending} ${text.longRunning || copy.en.longRunning}`);
 
     const queuedJob = await createQueuedJob(backendUrl);
     if (queuedJob) {
-      await waitForQueuedMidi(backendUrl, queuedJob);
+      await waitForQueuedMidi(backendUrl, queuedJob, runId);
     } else {
+      updateJobPanel({
+        status: "processing",
+        message: "Backend does not support queue yet. Converting directly.",
+        progress: 30,
+        canStop: true,
+      });
       const response = await fetch(`${backendUrl}/convert`, {
         method: "POST",
         body: buildConversionFormData(),
@@ -244,10 +265,36 @@ elements.convert.addEventListener("click", async () => {
 
     setProgress(100);
     setStatus(text.ready);
+    updateJobPanel({
+      status: "done",
+      message: "MIDI is ready. Download it or open it in the trainer.",
+      progress: 100,
+      canStop: false,
+      canRetry: false,
+    });
   } catch (error) {
     console.error(error);
+    if (error.message === STOPPED_WAITING_MESSAGE) {
+      setProgress(0);
+      setStatus("Stopped waiting. You can start a new conversion when ready.");
+      updateJobPanel({
+        status: "stopped",
+        message: "Stopped waiting in this browser. The backend task may still finish in the background.",
+        progress: 0,
+        canStop: false,
+        canRetry: Boolean(selectedFile),
+      });
+      return;
+    }
     setProgress(0);
     setStatus(error.message || text.failed);
+    updateJobPanel({
+      status: "failed",
+      message: error.message || text.failed,
+      progress: 0,
+      canStop: false,
+      canRetry: Boolean(selectedFile),
+    });
   } finally {
     stopConversionTimer();
     setBusy(false);
@@ -298,6 +345,7 @@ function resetResult() {
   showEngineName("");
   if (resultUrl) URL.revokeObjectURL(resultUrl);
   resultUrl = "";
+  resetJobPanel();
 }
 
 function showEngineName(engine, preprocess) {
@@ -328,10 +376,11 @@ function setBusy(isBusy, checkLabel = text.checkBackend, convertLabel = text.con
 
 function startConversionTimer() {
   stopConversionTimer();
-  const startedAt = Date.now();
+  elapsedStartedAt = Date.now();
   conversionTimer = window.setInterval(() => {
-    const elapsed = formatElapsed(Date.now() - startedAt);
+    const elapsed = formatElapsed(Date.now() - elapsedStartedAt);
     setStatus((text.stillWorking || copy.en.stillWorking)(elapsed));
+    updateJobElapsed(elapsed);
   }, 15000);
 }
 
@@ -339,6 +388,7 @@ function stopConversionTimer() {
   if (!conversionTimer) return;
   window.clearInterval(conversionTimer);
   conversionTimer = 0;
+  elapsedStartedAt = 0;
 }
 
 function ensureQualityControl() {
@@ -404,13 +454,24 @@ async function createQueuedJob(backendUrl) {
   const job = await response.json();
   setProgress(job.progress || 10);
   setStatus(formatJobStatus(job));
+  updateJobPanel({
+    status: job.status || "queued",
+    message: formatJobStatus(job),
+    progress: job.progress || 10,
+    jobId: job.job_id,
+    canStop: true,
+  });
   return job;
 }
 
-async function waitForQueuedMidi(backendUrl, initialJob) {
+async function waitForQueuedMidi(backendUrl, initialJob, runId) {
   let job = initialJob;
 
   while (job.status !== "done") {
+    if (runId !== activeRunId) {
+      throw new Error(STOPPED_WAITING_MESSAGE);
+    }
+
     if (job.status === "failed") {
       throw new Error(job.error || job.message || text.failed);
     }
@@ -425,10 +486,24 @@ async function waitForQueuedMidi(backendUrl, initialJob) {
     job = await response.json();
     setProgress(job.progress || (job.status === "processing" ? 45 : 15));
     setStatus(formatJobStatus(job));
+    updateJobPanel({
+      status: job.status,
+      message: formatJobStatus(job),
+      progress: job.progress || (job.status === "processing" ? 45 : 15),
+      jobId: job.job_id,
+      canStop: true,
+    });
   }
 
   setProgress(88);
   setStatus(text.receiving);
+  updateJobPanel({
+    status: "downloading",
+    message: "Conversion finished. Downloading MIDI...",
+    progress: 88,
+    jobId: job.job_id,
+    canStop: true,
+  });
 
   const midiResponse = await fetch(`${backendUrl}/jobs/${encodeURIComponent(job.job_id)}/midi`);
   if (!midiResponse.ok) {
@@ -459,6 +534,146 @@ function formatJobStatus(job) {
   if (status === "done") return "Conversion finished. Downloading MIDI...";
   if (status === "failed") return job.error || "Conversion failed.";
   return job.message || "Preparing conversion...";
+}
+
+function ensureJobPanel() {
+  if (jobPanel || !elements.progress) return;
+
+  const card = document.createElement("div");
+  card.className = "job-panel";
+  card.hidden = true;
+
+  const header = document.createElement("div");
+  header.className = "job-panel-header";
+
+  const badge = document.createElement("span");
+  badge.className = "job-status-badge";
+  badge.textContent = "Idle";
+
+  const title = document.createElement("strong");
+  title.textContent = "Conversion task";
+
+  const elapsed = document.createElement("small");
+  elapsed.className = "job-elapsed";
+  elapsed.textContent = "0s";
+
+  header.append(badge, title, elapsed);
+
+  const steps = document.createElement("ol");
+  steps.className = "job-steps";
+  for (const [step, label] of [
+    ["uploading", "Upload"],
+    ["queued", "Queue"],
+    ["processing", "Convert"],
+    ["done", "Ready"],
+  ]) {
+    const item = document.createElement("li");
+    item.dataset.step = step;
+    item.textContent = label;
+    steps.append(item);
+  }
+
+  const message = document.createElement("p");
+  message.className = "job-message";
+
+  const meta = document.createElement("small");
+  meta.className = "job-meta";
+
+  const actions = document.createElement("div");
+  actions.className = "job-actions";
+
+  const stopButton = document.createElement("button");
+  stopButton.type = "button";
+  stopButton.className = "secondary";
+  stopButton.textContent = "Stop waiting";
+  stopButton.addEventListener("click", () => {
+    activeRunId += 1;
+    stopConversionTimer();
+    setBusy(false);
+    setStatus("Stopped waiting. You can start a new conversion when ready.");
+    updateJobPanel({
+      status: "stopped",
+      message: "Stopped waiting in this browser. The backend task may still finish in the background.",
+      canStop: false,
+      canRetry: Boolean(selectedFile),
+    });
+  });
+
+  const retryButton = document.createElement("button");
+  retryButton.type = "button";
+  retryButton.textContent = "Try again";
+  retryButton.addEventListener("click", () => {
+    if (!selectedFile || elements.convert.disabled) return;
+    elements.convert.click();
+  });
+
+  actions.append(stopButton, retryButton);
+  card.append(header, steps, message, meta, actions);
+  elements.progress.parentElement.append(card);
+
+  jobPanel = { card, badge, elapsed, steps, message, meta, stopButton, retryButton };
+}
+
+function updateJobPanel({ status, message, progress, jobId, canStop = false, canRetry = false }) {
+  ensureJobPanel();
+  if (!jobPanel) return;
+
+  jobPanel.card.hidden = false;
+  jobPanel.card.dataset.status = status;
+  if (jobId) activeJobId = jobId;
+  jobPanel.badge.textContent = labelForJobStatus(status);
+  jobPanel.message.textContent = message || "";
+  jobPanel.meta.textContent = activeJobId ? `Task ID: ${shortJobId(activeJobId)}` : "";
+  jobPanel.stopButton.hidden = !canStop;
+  jobPanel.retryButton.hidden = !canRetry;
+  if (typeof progress === "number") setProgress(progress);
+
+  const activeIndex = stepIndexForStatus(status);
+  for (const [index, item] of [...jobPanel.steps.children].entries()) {
+    item.classList.toggle("active", index === activeIndex);
+    item.classList.toggle("complete", index < activeIndex || status === "done");
+  }
+
+  if (elapsedStartedAt) {
+    updateJobElapsed(formatElapsed(Date.now() - elapsedStartedAt));
+  }
+}
+
+function resetJobPanel() {
+  if (!jobPanel) return;
+  jobPanel.card.hidden = true;
+  jobPanel.card.dataset.status = "idle";
+  jobPanel.elapsed.textContent = "0s";
+  activeJobId = "";
+}
+
+function updateJobElapsed(value) {
+  if (jobPanel && !jobPanel.card.hidden) {
+    jobPanel.elapsed.textContent = value;
+  }
+}
+
+function labelForJobStatus(status) {
+  if (status === "uploading") return "Uploading";
+  if (status === "queued") return "Queued";
+  if (status === "processing") return "Processing";
+  if (status === "downloading") return "Downloading";
+  if (status === "done") return "Ready";
+  if (status === "failed") return "Failed";
+  if (status === "stopped") return "Stopped";
+  return "Working";
+}
+
+function stepIndexForStatus(status) {
+  if (status === "uploading") return 0;
+  if (status === "queued") return 1;
+  if (status === "processing" || status === "downloading") return 2;
+  if (status === "done") return 3;
+  return -1;
+}
+
+function shortJobId(jobId) {
+  return String(jobId || "").slice(0, 8);
 }
 
 function sleep(milliseconds) {

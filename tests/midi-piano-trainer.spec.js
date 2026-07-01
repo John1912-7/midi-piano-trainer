@@ -257,6 +257,10 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   await page.locator("#convertAudioButton").click();
   expect(jobBody).toContain('name="quality"');
   expect(jobBody).toContain("balanced");
+  await expect(page.locator(".job-panel")).toBeVisible();
+  await expect(page.locator(".job-meta")).toContainText("job-1");
+  await expect(page.locator(".job-steps")).toContainText("Upload");
+  await expect(page.locator(".job-steps")).toContainText("Ready");
   await expect(page.locator("#conversionStatus")).toContainText("MIDI готов");
   await expect(page.locator("#generatedFileName")).toHaveText("test-tone.mid");
   await expect(page.locator("#generatedNoteCount")).toHaveText("3");

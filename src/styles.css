@@ -730,6 +730,91 @@ select {
   color: var(--muted);
 }
 
+.job-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #111418;
+}
+
+.job-panel[hidden] {
+  display: none;
+}
+
+.job-panel-header,
+.job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.job-panel-header strong {
+  margin-right: auto;
+}
+
+.job-status-badge {
+  border: 1px solid rgba(40, 215, 178, 0.35);
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(40, 215, 178, 0.12);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.job-panel[data-status="failed"] .job-status-badge,
+.job-panel[data-status="stopped"] .job-status-badge {
+  border-color: rgba(255, 176, 77, 0.45);
+  background: rgba(255, 176, 77, 0.12);
+  color: #ffcf86;
+}
+
+.job-elapsed,
+.job-meta,
+.job-message {
+  color: var(--muted);
+}
+
+.job-message {
+  margin: 0;
+}
+
+.job-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.job-steps li {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+}
+
+.job-steps li.complete,
+.job-steps li.active {
+  border-color: rgba(40, 215, 178, 0.35);
+  color: #f4f7f8;
+}
+
+.job-steps li.complete {
+  background: rgba(40, 215, 178, 0.08);
+}
+
+.job-steps li.active {
+  background: rgba(40, 215, 178, 0.16);
+}
+
 .conversion-result {
   grid-column: 1 / -1;
   display: grid;
@@ -841,5 +926,13 @@ select {
 
   .benchmark-result-actions button {
     width: 100%;
+  }
+
+  .job-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .job-actions button {
+    flex: 1 1 140px;
   }
 }
