@@ -306,6 +306,7 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   expect(jobBody).toContain('name="quality"');
   expect(jobBody).toContain("balanced");
   await expect(page.locator(".job-panel")).toBeVisible();
+  await expect(page.locator(".job-estimate")).toContainText(/remaining/i);
   await expect(page.locator(".job-meta")).toContainText("job-1");
   await expect(page.locator(".job-steps")).toContainText("Upload");
   await expect(page.locator(".job-steps")).toContainText("Ready");

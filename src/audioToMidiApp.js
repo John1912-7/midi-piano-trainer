@@ -2,6 +2,8 @@ const MAX_AUDIO_MB = 25;
 const MAX_AUDIO_SECONDS = 60;
 const JOB_POLL_MS = 3000;
 const STOPPED_WAITING_MESSAGE = "Stopped waiting for this task.";
+const ESTIMATE_MIN_SECONDS = 45;
+const ESTIMATE_QUEUE_BUFFER_SECONDS = 90;
 const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
 const QUALITY_PRESET_KEY = "midiPianoTrainerAudioQuality";
@@ -144,12 +146,14 @@ const language = getLanguage();
 const text = copy[language] || copy.en;
 
 let selectedFile = null;
+let selectedAudioDuration = 0;
 let generatedMidiBytes = null;
 let generatedMidiName = "converted.mid";
 let resultUrl = "";
 let conversionTimer = 0;
 let activeRunId = 0;
 let activeJobId = "";
+let activeEstimate = null;
 let elapsedStartedAt = 0;
 let jobPanel = null;
 
@@ -199,6 +203,7 @@ elements.checkBackend.addEventListener("click", async () => {
 
 elements.file.addEventListener("change", () => {
   selectedFile = elements.file.files?.[0] || null;
+  selectedAudioDuration = 0;
   resetResult();
 
   if (!selectedFile) {
@@ -214,6 +219,7 @@ elements.file.addEventListener("change", () => {
 
   setProgress(0);
   updateConvertState();
+  loadSelectedAudioDuration(selectedFile);
 });
 
 elements.convert.addEventListener("click", async () => {
@@ -227,11 +233,12 @@ elements.convert.addEventListener("click", async () => {
 
   try {
     const runId = ++activeRunId;
+    activeEstimate = estimateConversionTime(selectedFile, selectedAudioDuration, getQualityPreset());
     setBusy(true);
     setProgress(8);
     updateJobPanel({
       status: "uploading",
-      message: "Uploading your audio to the backend.",
+      message: `Uploading your audio to the backend. ${formatEstimateMessage()}`,
       progress: 8,
       jobId: "",
       canStop: true,
@@ -246,7 +253,7 @@ elements.convert.addEventListener("click", async () => {
     } else {
       updateJobPanel({
         status: "processing",
-        message: "Backend does not support queue yet. Converting directly.",
+        message: `Backend does not support queue yet. Converting directly. ${formatEstimateMessage()}`,
         progress: 30,
         canStop: true,
       });
@@ -389,6 +396,7 @@ function stopConversionTimer() {
   window.clearInterval(conversionTimer);
   conversionTimer = 0;
   elapsedStartedAt = 0;
+  activeEstimate = null;
 }
 
 function ensureQualityControl() {
@@ -579,6 +587,9 @@ function ensureJobPanel() {
   const meta = document.createElement("small");
   meta.className = "job-meta";
 
+  const estimate = document.createElement("small");
+  estimate.className = "job-estimate";
+
   const actions = document.createElement("div");
   actions.className = "job-actions";
 
@@ -608,10 +619,10 @@ function ensureJobPanel() {
   });
 
   actions.append(stopButton, retryButton);
-  card.append(header, steps, message, meta, actions);
+  card.append(header, steps, message, meta, estimate, actions);
   elements.progress.parentElement.append(card);
 
-  jobPanel = { card, badge, elapsed, steps, message, meta, stopButton, retryButton };
+  jobPanel = { card, badge, elapsed, steps, message, meta, estimate, stopButton, retryButton };
 }
 
 function updateJobPanel({ status, message, progress, jobId, canStop = false, canRetry = false }) {
@@ -624,6 +635,7 @@ function updateJobPanel({ status, message, progress, jobId, canStop = false, can
   jobPanel.badge.textContent = labelForJobStatus(status);
   jobPanel.message.textContent = message || "";
   jobPanel.meta.textContent = activeJobId ? `Task ID: ${shortJobId(activeJobId)}` : "";
+  jobPanel.estimate.textContent = formatEstimateMeta(status);
   jobPanel.stopButton.hidden = !canStop;
   jobPanel.retryButton.hidden = !canRetry;
   if (typeof progress === "number") setProgress(progress);
@@ -644,12 +656,15 @@ function resetJobPanel() {
   jobPanel.card.hidden = true;
   jobPanel.card.dataset.status = "idle";
   jobPanel.elapsed.textContent = "0s";
+  jobPanel.estimate.textContent = "";
   activeJobId = "";
+  activeEstimate = null;
 }
 
 function updateJobElapsed(value) {
   if (jobPanel && !jobPanel.card.hidden) {
     jobPanel.elapsed.textContent = value;
+    jobPanel.estimate.textContent = formatEstimateMeta(jobPanel.card.dataset.status);
   }
 }
 
@@ -676,6 +691,53 @@ function shortJobId(jobId) {
   return String(jobId || "").slice(0, 8);
 }
 
+function estimateConversionTime(file, durationSeconds, qualityPreset) {
+  const duration = durationSeconds || estimateAudioDurationFromSize(file);
+  const profileMultiplier = qualityPreset === "sensitive" ? 1.25 : qualityPreset === "clean" ? 0.9 : 1;
+  const lower = Math.max(ESTIMATE_MIN_SECONDS, Math.round((duration * 5 + 30) * profileMultiplier));
+  const upper = Math.max(ESTIMATE_MIN_SECONDS * 2, Math.round((duration * 14 + ESTIMATE_QUEUE_BUFFER_SECONDS) * profileMultiplier));
+  return {
+    lower,
+    upper: Math.max(upper, lower + 30),
+    source: durationSeconds ? "duration" : "size",
+  };
+}
+
+function estimateAudioDurationFromSize(file) {
+  if (!file?.size) return 20;
+  const bytesPerSecond = file.type === "audio/wav" || file.name?.toLowerCase().endsWith(".wav") ? 176400 : 16000;
+  return Math.min(MAX_AUDIO_SECONDS, Math.max(5, file.size / bytesPerSecond));
+}
+
+function formatEstimateMessage() {
+  if (!activeEstimate) return "";
+  return `Estimated wait: about ${formatDurationRange(activeEstimate.lower, activeEstimate.upper)}.`;
+}
+
+function formatEstimateMeta(status) {
+  if (!activeEstimate || ["done", "failed", "stopped"].includes(status)) return "";
+  const elapsedSeconds = elapsedStartedAt ? Math.round((Date.now() - elapsedStartedAt) / 1000) : 0;
+  const remainingLower = Math.max(0, activeEstimate.lower - elapsedSeconds);
+  const remainingUpper = Math.max(0, activeEstimate.upper - elapsedSeconds);
+  if (remainingUpper === 0) {
+    return "Taking longer than usual. The free backend may still be working.";
+  }
+  const prefix = activeEstimate.source === "duration" ? "Approx remaining" : "Rough remaining";
+  return `${prefix}: ${formatDurationRange(remainingLower, remainingUpper)}`;
+}
+
+function formatDurationRange(lowerSeconds, upperSeconds) {
+  const lower = formatApproxDuration(lowerSeconds);
+  const upper = formatApproxDuration(upperSeconds);
+  return lower === upper ? lower : `${lower}-${upper}`;
+}
+
+function formatApproxDuration(seconds) {
+  if (seconds < 60) return `${Math.max(5, Math.round(seconds / 5) * 5)}s`;
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  return `${minutes} min`;
+}
+
 function sleep(milliseconds) {
   return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
@@ -690,6 +752,27 @@ function setSelectedFile(file) {
 
   elements.selectedFileName.textContent = file.name;
   elements.selectedFileMeta.textContent = `${formatBytes(file.size)} - ${file.type || "audio file"}`;
+}
+
+function loadSelectedAudioDuration(file) {
+  if (!file || !elements.selectedFileMeta) return;
+  const audio = document.createElement("audio");
+  const url = URL.createObjectURL(file);
+  audio.preload = "metadata";
+
+  audio.addEventListener("loadedmetadata", () => {
+    selectedAudioDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    URL.revokeObjectURL(url);
+    if (selectedFile === file && selectedAudioDuration > 0) {
+      elements.selectedFileMeta.textContent = `${formatBytes(file.size)} - ${formatElapsed(selectedAudioDuration * 1000)} audio`;
+    }
+  });
+
+  audio.addEventListener("error", () => {
+    URL.revokeObjectURL(url);
+  });
+
+  audio.src = url;
 }
 
 function setStatus(message) {

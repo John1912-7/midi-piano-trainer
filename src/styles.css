@@ -775,6 +775,7 @@ select {
 
 .job-elapsed,
 .job-meta,
+.job-estimate,
 .job-message {
   color: var(--muted);
 }
