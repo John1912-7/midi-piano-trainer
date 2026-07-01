@@ -1,5 +1,6 @@
 const MAX_AUDIO_MB = 25;
 const MAX_AUDIO_SECONDS = 60;
+const JOB_POLL_MS = 3000;
 const GENERATED_MIDI_KEY = "midiPianoTrainerGeneratedMidi";
 const BACKEND_URL_KEY = "midiPianoTrainerBackendUrl";
 const QUALITY_PRESET_KEY = "midiPianoTrainerAudioQuality";
@@ -224,30 +225,23 @@ elements.convert.addEventListener("click", async () => {
     startConversionTimer();
     setStatus(`${text.sending} ${text.longRunning || copy.en.longRunning}`);
 
-    const formData = new FormData();
-    formData.append("quality", getQualityPreset());
-    formData.append("file", selectedFile, selectedFile.name);
+    const queuedJob = await createQueuedJob(backendUrl);
+    if (queuedJob) {
+      await waitForQueuedMidi(backendUrl, queuedJob);
+    } else {
+      const response = await fetch(`${backendUrl}/convert`, {
+        method: "POST",
+        body: buildConversionFormData(),
+      });
 
-    const response = await fetch(`${backendUrl}/convert`, {
-      method: "POST",
-      body: formData,
-    });
+      if (!response.ok) {
+        const message = await readErrorMessage(response);
+        throw new Error(message || text.backendStatus(response.status));
+      }
 
-    if (!response.ok) {
-      const message = await readErrorMessage(response);
-      throw new Error(message || text.backendStatus(response.status));
+      await storeMidiResponse(response);
     }
 
-    setProgress(82);
-    setStatus(text.receiving);
-
-    generatedMidiBytes = new Uint8Array(await response.arrayBuffer());
-    generatedMidiName = response.headers.get("X-Midi-Filename") || `${cleanFileName(selectedFile.name)}.mid`;
-    const noteCount = response.headers.get("X-Note-Count") || "?";
-    const engine = response.headers.get("X-Transcription-Engine") || "transkun";
-    const preprocess = response.headers.get("X-Audio-Preprocess") || "";
-
-    showResult(noteCount, engine, preprocess);
     setProgress(100);
     setStatus(text.ready);
   } catch (error) {
@@ -383,6 +377,92 @@ function ensureQualityControl() {
 function getQualityPreset() {
   const value = elements.quality?.value || "balanced";
   return ["clean", "balanced", "sensitive"].includes(value) ? value : "balanced";
+}
+
+function buildConversionFormData() {
+  const formData = new FormData();
+  formData.append("quality", getQualityPreset());
+  formData.append("file", selectedFile, selectedFile.name);
+  return formData;
+}
+
+async function createQueuedJob(backendUrl) {
+  const response = await fetch(`${backendUrl}/jobs`, {
+    method: "POST",
+    body: buildConversionFormData(),
+  });
+
+  if (response.status === 404 || response.status === 405) {
+    return null;
+  }
+
+  if (!response.ok) {
+    const message = await readErrorMessage(response);
+    throw new Error(message || text.backendStatus(response.status));
+  }
+
+  const job = await response.json();
+  setProgress(job.progress || 10);
+  setStatus(formatJobStatus(job));
+  return job;
+}
+
+async function waitForQueuedMidi(backendUrl, initialJob) {
+  let job = initialJob;
+
+  while (job.status !== "done") {
+    if (job.status === "failed") {
+      throw new Error(job.error || job.message || text.failed);
+    }
+
+    await sleep(JOB_POLL_MS);
+    const response = await fetch(`${backendUrl}/jobs/${encodeURIComponent(job.job_id)}`);
+    if (!response.ok) {
+      const message = await readErrorMessage(response);
+      throw new Error(message || text.backendStatus(response.status));
+    }
+
+    job = await response.json();
+    setProgress(job.progress || (job.status === "processing" ? 45 : 15));
+    setStatus(formatJobStatus(job));
+  }
+
+  setProgress(88);
+  setStatus(text.receiving);
+
+  const midiResponse = await fetch(`${backendUrl}/jobs/${encodeURIComponent(job.job_id)}/midi`);
+  if (!midiResponse.ok) {
+    const message = await readErrorMessage(midiResponse);
+    throw new Error(message || text.backendStatus(midiResponse.status));
+  }
+
+  await storeMidiResponse(midiResponse);
+}
+
+async function storeMidiResponse(response) {
+  setProgress(82);
+  setStatus(text.receiving);
+
+  generatedMidiBytes = new Uint8Array(await response.arrayBuffer());
+  generatedMidiName = response.headers.get("X-Midi-Filename") || `${cleanFileName(selectedFile.name)}.mid`;
+  const noteCount = response.headers.get("X-Note-Count") || "?";
+  const engine = response.headers.get("X-Transcription-Engine") || "transkun";
+  const preprocess = response.headers.get("X-Audio-Preprocess") || "";
+
+  showResult(noteCount, engine, preprocess);
+}
+
+function formatJobStatus(job) {
+  const status = job?.status || "queued";
+  if (status === "queued") return "Task is queued. Waiting for the free server...";
+  if (status === "processing") return "Converting audio to MIDI. You can keep this page open.";
+  if (status === "done") return "Conversion finished. Downloading MIDI...";
+  if (status === "failed") return job.error || "Conversion failed.";
+  return job.message || "Preparing conversion...";
+}
+
+function sleep(milliseconds) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
 function setSelectedFile(file) {

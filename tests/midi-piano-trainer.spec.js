@@ -188,7 +188,7 @@ test("opens the audio-to-midi page and checks backend health", async ({ page }) 
 
 test("converts audio through backend and opens the generated MIDI in the trainer", async ({ page }) => {
   const midi = createMidiFile([60, 64, 67]);
-  let convertBody = "";
+  let jobBody = "";
 
   await page.route("http://127.0.0.1:7860/health", async (route) => {
     await route.fulfill({
@@ -198,16 +198,48 @@ test("converts audio through backend and opens the generated MIDI in the trainer
     });
   });
 
-  await page.route("http://127.0.0.1:7860/convert", async (route) => {
-    convertBody = route.request().postDataBuffer()?.toString("utf8") || "";
+  await page.route("http://127.0.0.1:7860/jobs", async (route) => {
+    jobBody = route.request().postDataBuffer()?.toString("utf8") || "";
+    await route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: JSON.stringify({
+        job_id: "job-1",
+        status: "queued",
+        progress: 5,
+        filename: "test-tone.mid",
+      }),
+    });
+  });
+
+  await page.route("http://127.0.0.1:7860/jobs/job-1", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        job_id: "job-1",
+        status: "done",
+        progress: 100,
+        filename: "test-tone.mid",
+        note_count: 3,
+        quality: "balanced",
+        engine: "transkun",
+        preprocess: "normalize",
+      }),
+    });
+  });
+
+  await page.route("http://127.0.0.1:7860/jobs/job-1/midi", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "audio/midi",
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Expose-Headers": "X-Midi-Filename, X-Note-Count",
+        "Access-Control-Expose-Headers": "X-Midi-Filename, X-Note-Count, X-Transcription-Engine, X-Audio-Preprocess",
         "X-Midi-Filename": "test-tone.mid",
         "X-Note-Count": "3",
+        "X-Transcription-Engine": "transkun",
+        "X-Audio-Preprocess": "normalize",
       },
       body: midi,
     });
@@ -223,8 +255,8 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   });
 
   await page.locator("#convertAudioButton").click();
-  expect(convertBody).toContain('name="quality"');
-  expect(convertBody).toContain("balanced");
+  expect(jobBody).toContain('name="quality"');
+  expect(jobBody).toContain("balanced");
   await expect(page.locator("#conversionStatus")).toContainText("MIDI готов");
   await expect(page.locator("#generatedFileName")).toHaveText("test-tone.mid");
   await expect(page.locator("#generatedNoteCount")).toHaveText("3");

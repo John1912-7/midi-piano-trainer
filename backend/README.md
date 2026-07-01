@@ -23,6 +23,11 @@ Public frontend:
 
 - `GET /health` - health check
 - `POST /convert` - accepts `multipart/form-data` with `file`, returns `.mid`
+- `POST /jobs` - accepts `multipart/form-data` with `file`, returns a queued job
+- `GET /jobs/{job_id}` - returns queued/processing/done/failed status
+- `GET /jobs/{job_id}/midi` - returns the finished `.mid`
+
+The `/jobs` API is the preferred public path because Transkun can be slow on free CPU hosting. The older `/convert` endpoint stays available for compatibility and benchmark scripts.
 
 Supported input formats:
 

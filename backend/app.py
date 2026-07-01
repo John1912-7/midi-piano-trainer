@@ -1,7 +1,12 @@
 import os
+import queue
+import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
+import uuid
 import wave
 from pathlib import Path
 
@@ -18,6 +23,13 @@ TRANSKUN_DEVICE = os.getenv("TRANSKUN_DEVICE", "cpu").strip() or "cpu"
 MAX_CONVERSION_SECONDS = int(os.getenv("MAX_CONVERSION_SECONDS", "900"))
 MAX_AUDIO_SECONDS = float(os.getenv("MAX_AUDIO_SECONDS", "60"))
 PREPROCESS_VERSION = "2026-07-01-format-explicit"
+JOBS_DIR = Path(os.getenv("JOBS_DIR", "/tmp/midi-piano-jobs"))
+MAX_STORED_JOBS = int(os.getenv("MAX_STORED_JOBS", "20"))
+
+jobs: dict[str, dict] = {}
+jobs_lock = threading.Lock()
+job_queue: queue.Queue[str] = queue.Queue()
+job_worker_started = False
 
 app = FastAPI(title="MIDI Piano Trainer Backend")
 
@@ -39,6 +51,7 @@ app.add_middleware(
         "X-Quality-Preset",
         "X-Transcription-Engine",
         "X-Audio-Preprocess",
+        "X-Job-Id",
     ],
 )
 
@@ -58,6 +71,8 @@ def health():
         "quality_presets": list(QUALITY_PRESETS),
         "preprocess_profiles": list(PREPROCESS_PROFILES),
         "preprocess_version": PREPROCESS_VERSION,
+        "job_queue": True,
+        "queued_jobs": job_queue.qsize(),
     }
 
 
@@ -75,42 +90,11 @@ async def convert(file: UploadFile = File(...), quality: str = Form("clean")):
         input_path = temp_path / f"input{suffix}"
         output_path = temp_path / "converted.mid"
 
-        size = 0
-        with input_path.open("wb") as output:
-            while chunk := await file.read(1024 * 1024):
-                size += len(chunk)
-                if size > MAX_UPLOAD_BYTES:
-                    raise HTTPException(
-                        status_code=413,
-                        detail=f"The file is too large. MVP limit: {MAX_UPLOAD_MB} MB.",
-                    )
-                output.write(chunk)
-
-        duration_seconds = audio_duration_seconds(input_path)
-        if duration_seconds and duration_seconds > MAX_AUDIO_SECONDS:
-            raise HTTPException(
-                status_code=413,
-                detail=(
-                    f"The audio is too long for this MVP. "
-                    f"Limit: {format_seconds(MAX_AUDIO_SECONDS)}."
-                ),
-            )
-
-        preset_name = quality if quality in QUALITY_PRESETS else "balanced"
-        engine = selected_engine()
-        preprocess_name = "none"
+        await save_upload_to_path(file, input_path)
+        validate_audio_duration(input_path)
 
         try:
-            if engine == "basic-pitch":
-                cleaned_note_count = transcribe_with_basic_pitch(input_path, output_path, preset_name)
-            else:
-                transkun_input, preprocess_name = prepare_audio_for_transkun(
-                    input_path,
-                    temp_path / "preprocessed.wav",
-                    preset_name,
-                )
-                transcribe_with_transkun(transkun_input, output_path)
-                cleaned_note_count = count_midi_notes(output_path)
+            metadata = create_midi_from_audio(input_path, output_path, quality)
         except subprocess.TimeoutExpired as error:
             raise HTTPException(
                 status_code=504,
@@ -131,12 +115,90 @@ async def convert(file: UploadFile = File(...), quality: str = Form("clean")):
             headers={
                 "Content-Disposition": f'attachment; filename="{public_name}"',
                 "X-Midi-Filename": public_name,
-                "X-Note-Count": str(cleaned_note_count),
-                "X-Quality-Preset": preset_name,
-                "X-Transcription-Engine": engine,
-                "X-Audio-Preprocess": preprocess_name,
+                "X-Note-Count": str(metadata["note_count"]),
+                "X-Quality-Preset": metadata["quality"],
+                "X-Transcription-Engine": metadata["engine"],
+                "X-Audio-Preprocess": metadata["preprocess"],
             },
         )
+
+
+@app.post("/jobs")
+async def create_job(file: UploadFile = File(...), quality: str = Form("clean")):
+    ensure_job_worker()
+    cleanup_old_jobs()
+
+    suffix = Path(file.filename or "").suffix.lower()
+    if suffix not in ALLOWED_SUFFIXES:
+        raise HTTPException(
+            status_code=400,
+            detail="Only MP3, WAV, OGG, FLAC and M4A files are supported.",
+        )
+
+    job_id = uuid.uuid4().hex
+    job_dir = JOBS_DIR / job_id
+    job_dir.mkdir(parents=True, exist_ok=True)
+    input_path = job_dir / f"input{suffix}"
+    output_path = job_dir / "converted.mid"
+    public_name = f"{safe_stem(file.filename)}.mid"
+    preset_name = quality if quality in QUALITY_PRESETS else "balanced"
+
+    await save_upload_to_path(file, input_path)
+    validate_audio_duration(input_path)
+
+    job = {
+        "job_id": job_id,
+        "status": "queued",
+        "progress": 5,
+        "message": "Waiting for conversion.",
+        "filename": public_name,
+        "note_count": None,
+        "quality": preset_name,
+        "engine": selected_engine(),
+        "preprocess": None,
+        "error": None,
+        "created_at": time.time(),
+        "updated_at": time.time(),
+        "input_path": str(input_path),
+        "output_path": str(output_path),
+    }
+
+    with jobs_lock:
+        jobs[job_id] = job
+
+    job_queue.put(job_id)
+    return JSONResponse(status_code=202, content=serialize_job(job))
+
+
+@app.get("/jobs/{job_id}")
+def get_job(job_id: str):
+    job = find_job(job_id)
+    return serialize_job(job)
+
+
+@app.get("/jobs/{job_id}/midi")
+def get_job_midi(job_id: str):
+    job = find_job(job_id)
+    if job["status"] != "done":
+        raise HTTPException(status_code=409, detail="MIDI is not ready yet.")
+
+    output_path = Path(job["output_path"])
+    if not output_path.exists():
+        raise HTTPException(status_code=404, detail="MIDI file is no longer available.")
+
+    return Response(
+        content=output_path.read_bytes(),
+        media_type="audio/midi",
+        headers={
+            "Content-Disposition": f'attachment; filename="{job["filename"]}"',
+            "X-Job-Id": job_id,
+            "X-Midi-Filename": job["filename"],
+            "X-Note-Count": str(job["note_count"] or 0),
+            "X-Quality-Preset": job["quality"],
+            "X-Transcription-Engine": job["engine"],
+            "X-Audio-Preprocess": job["preprocess"] or "none",
+        },
+    )
 
 
 @app.exception_handler(HTTPException)
@@ -148,6 +210,163 @@ def safe_stem(filename: str | None) -> str:
     stem = Path(filename or "converted").stem
     cleaned = "".join(char if char.isalnum() or char in "-_." else "-" for char in stem).strip("-")
     return cleaned or "converted"
+
+
+async def save_upload_to_path(file: UploadFile, input_path: Path) -> None:
+    size = 0
+    with input_path.open("wb") as output:
+        while chunk := await file.read(1024 * 1024):
+            size += len(chunk)
+            if size > MAX_UPLOAD_BYTES:
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"The file is too large. MVP limit: {MAX_UPLOAD_MB} MB.",
+                )
+            output.write(chunk)
+
+
+def validate_audio_duration(input_path: Path) -> None:
+    duration_seconds = audio_duration_seconds(input_path)
+    if duration_seconds and duration_seconds > MAX_AUDIO_SECONDS:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                f"The audio is too long for this MVP. "
+                f"Limit: {format_seconds(MAX_AUDIO_SECONDS)}."
+            ),
+        )
+
+
+def create_midi_from_audio(input_path: Path, output_path: Path, quality: str) -> dict[str, str | int]:
+    preset_name = quality if quality in QUALITY_PRESETS else "balanced"
+    engine = selected_engine()
+    preprocess_name = "none"
+
+    if engine == "basic-pitch":
+        cleaned_note_count = transcribe_with_basic_pitch(input_path, output_path, preset_name)
+    else:
+        transkun_input, preprocess_name = prepare_audio_for_transkun(
+            input_path,
+            output_path.parent / "preprocessed.wav",
+            preset_name,
+        )
+        transcribe_with_transkun(transkun_input, output_path)
+        cleaned_note_count = count_midi_notes(output_path)
+
+    return {
+        "note_count": cleaned_note_count,
+        "quality": preset_name,
+        "engine": engine,
+        "preprocess": preprocess_name,
+    }
+
+
+def ensure_job_worker() -> None:
+    global job_worker_started
+    if job_worker_started:
+        return
+
+    with jobs_lock:
+        if job_worker_started:
+            return
+        JOBS_DIR.mkdir(parents=True, exist_ok=True)
+        worker = threading.Thread(target=job_worker_loop, name="midi-job-worker", daemon=True)
+        worker.start()
+        job_worker_started = True
+
+
+def job_worker_loop() -> None:
+    while True:
+        job_id = job_queue.get()
+        try:
+            process_job(job_id)
+        finally:
+            job_queue.task_done()
+
+
+def process_job(job_id: str) -> None:
+    job = find_job(job_id)
+    update_job(
+        job_id,
+        status="processing",
+        progress=20,
+        message="Converting audio to MIDI.",
+        updated_at=time.time(),
+    )
+
+    try:
+        metadata = create_midi_from_audio(
+            Path(job["input_path"]),
+            Path(job["output_path"]),
+            str(job["quality"]),
+        )
+        update_job(
+            job_id,
+            status="done",
+            progress=100,
+            message="MIDI is ready.",
+            note_count=metadata["note_count"],
+            engine=metadata["engine"],
+            preprocess=metadata["preprocess"],
+            updated_at=time.time(),
+        )
+    except subprocess.TimeoutExpired:
+        update_job(
+            job_id,
+            status="failed",
+            progress=0,
+            message="Conversion took too long.",
+            error="Audio-to-MIDI conversion took too long. Try a shorter piano clip.",
+            updated_at=time.time(),
+        )
+    except Exception as error:
+        update_job(
+            job_id,
+            status="failed",
+            progress=0,
+            message="Conversion failed.",
+            error=f"Could not create MIDI: {error}",
+            updated_at=time.time(),
+        )
+
+
+def find_job(job_id: str) -> dict:
+    with jobs_lock:
+        job = jobs.get(job_id)
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found.")
+        return dict(job)
+
+
+def update_job(job_id: str, **changes) -> None:
+    with jobs_lock:
+        if job_id in jobs:
+            jobs[job_id].update(changes)
+
+
+def serialize_job(job: dict) -> dict:
+    return {
+        key: value
+        for key, value in job.items()
+        if key not in {"input_path", "output_path"}
+    }
+
+
+def cleanup_old_jobs() -> None:
+    JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    with jobs_lock:
+        removable = sorted(
+            (
+                job
+                for job in jobs.values()
+                if job.get("status") in {"done", "failed"}
+            ),
+            key=lambda item: item.get("updated_at", 0),
+        )
+        while len(jobs) >= MAX_STORED_JOBS and removable:
+            job = removable.pop(0)
+            jobs.pop(job["job_id"], None)
+            shutil.rmtree(Path(job["input_path"]).parent, ignore_errors=True)
 
 
 QUALITY_PRESETS = {

@@ -64,7 +64,12 @@ https://vanya1912-midi-piano-trainer-backend.hf.space
 Endpoints:
 
 - `GET /health`
-- `POST /convert` with `multipart/form-data` fields `file` and optional `quality`
+- `POST /jobs` with `multipart/form-data` fields `file` and optional `quality`
+- `GET /jobs/{job_id}`
+- `GET /jobs/{job_id}/midi`
+- `POST /convert` with `multipart/form-data` fields `file` and optional `quality` for compatibility and benchmark scripts
+
+The public page uses the queued `/jobs` flow so a slow free backend can process one heavy Transkun conversion at a time and the user can see status while waiting.
 
 Quality presets:
 
@@ -87,6 +92,7 @@ Current backend limits:
 
 Expected response headers:
 
+- `X-Job-Id`
 - `X-Midi-Filename`
 - `X-Note-Count`
 - `X-Quality-Preset`
