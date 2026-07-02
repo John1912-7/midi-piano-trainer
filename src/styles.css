@@ -8,11 +8,15 @@
   --panel: #181b1f;
   --panel-2: #20242a;
   --line: #333a42;
-  --muted: #98a3ad;
+  --muted: #a9b4bd;
   --accent: #28d7b2;
   --accent-2: #ffd166;
   --danger: #ff6b6b;
   --good: #7bd88f;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
 }
 
 * {
@@ -27,6 +31,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  line-height: 1.5;
   background:
     radial-gradient(circle at top left, rgba(40, 215, 178, 0.14), transparent 28rem),
     #101114;
@@ -40,10 +45,10 @@ input {
 
 button,
 .file-button {
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0 14px;
+  padding: 0 var(--space-2);
   background: var(--panel-2);
   color: #f4f7f8;
   cursor: pointer;
@@ -56,11 +61,11 @@ button:hover,
 
 .button-link {
   display: inline-grid;
-  min-height: 40px;
+  min-height: 44px;
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0 14px;
+  padding: 0 var(--space-2);
   background: var(--panel-2);
   color: #f4f7f8;
   font-weight: 700;
@@ -79,7 +84,7 @@ button:disabled {
 .app {
   width: min(1440px, 100%);
   margin: 0 auto;
-  padding: 18px;
+  padding: var(--space-3);
 }
 
 .toolbar {
@@ -158,10 +163,10 @@ input[type="range"] {
 }
 
 select {
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0 10px;
+  padding: 0 12px;
   background: var(--panel-2);
   color: #f4f7f8;
 }
@@ -225,7 +230,7 @@ select {
 .site-tabs {
   display: flex;
   gap: 8px;
-  margin: 16px 0;
+  margin: 16px 0 24px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -387,7 +392,7 @@ select {
 
 .planning-hero {
   max-width: 860px;
-  margin-bottom: 28px;
+  margin-bottom: var(--space-4);
 }
 
 .planning-hero .eyebrow {
@@ -416,8 +421,8 @@ select {
 .planning-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
 .planning-grid article,
@@ -426,7 +431,7 @@ select {
 .youtube-note {
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 16px;
+  padding: var(--space-3);
   background: var(--panel);
 }
 
@@ -437,14 +442,14 @@ select {
 }
 
 .decision-panel {
-  margin-top: 14px;
+  margin-top: var(--space-2);
 }
 
 .converter-panel {
   display: grid;
   grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr);
-  gap: 16px;
-  margin-bottom: 14px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
   align-items: start;
 }
 
@@ -463,14 +468,14 @@ select {
 .converter-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2);
   justify-content: flex-end;
 }
 
 .quality-control {
   display: grid;
-  gap: 4px;
-  min-width: 160px;
+  gap: 6px;
+  min-width: 192px;
   color: var(--muted);
   font-size: 12px;
 }
@@ -480,16 +485,16 @@ select {
 }
 
 .quality-control small {
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
 .selected-file-card {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 12px;
+  padding: var(--space-2);
   background: #111418;
 }
 
@@ -559,7 +564,7 @@ select {
 }
 
 .benchmark-settings input[type="number"] {
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0 10px;
@@ -707,7 +712,7 @@ select {
 
 .backend-url-control input {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0 12px;
@@ -730,17 +735,17 @@ select {
 }
 
 .conversion-state p {
-  margin-top: 8px;
+  margin-top: var(--space-1);
   color: var(--muted);
 }
 
 .job-panel {
   display: grid;
-  gap: 12px;
-  margin-top: 14px;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 14px;
+  padding: var(--space-2);
   background: #111418;
 }
 
@@ -752,7 +757,7 @@ select {
 .job-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2);
   align-items: center;
 }
 
@@ -791,7 +796,7 @@ select {
 .job-steps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -800,7 +805,7 @@ select {
 .job-steps li {
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   color: var(--muted);
   text-align: center;
   font-size: 13px;
@@ -823,11 +828,11 @@ select {
 .feedback-panel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  gap: var(--space-3);
   align-items: center;
   border: 1px solid rgba(40, 215, 178, 0.22);
   border-radius: 8px;
-  padding: 18px;
+  padding: var(--space-3);
   background: rgba(40, 215, 178, 0.07);
 }
 
@@ -850,10 +855,10 @@ select {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto auto;
-  gap: 10px;
+  gap: var(--space-2);
   align-items: center;
   border-top: 1px solid var(--line);
-  padding-top: 14px;
+  padding-top: var(--space-2);
 }
 
 .conversion-result[hidden] {
@@ -878,7 +883,7 @@ select {
 
 .youtube-note input {
   width: 100%;
-  min-height: 40px;
+  min-height: 44px;
   margin-top: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -940,7 +945,7 @@ select {
 
 @media (max-width: 620px) {
   .app {
-    padding: 12px;
+    padding: var(--space-2);
   }
 
   .toolbar,
