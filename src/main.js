@@ -254,6 +254,9 @@ function createRangeNotice() {
 function ensureToolNav() {
   const existingNav = document.querySelector(".site-tabs");
   const nav = existingNav || document.createElement("nav");
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const pageLanguage = pathParts.find((part) => ["ru", "hy", "de", "es", "en"].includes(part));
+  const audioHref = pageLanguage ? "./audio-to-midi/" : `./${currentLanguage}/audio-to-midi/`;
 
   if (!existingNav) {
     nav.className = "site-tabs";
@@ -262,13 +265,14 @@ function ensureToolNav() {
   }
 
   ensureNavLink(nav, "trainer", "./", t(currentLanguage, "trainerTab"), true);
-  ensureNavLink(nav, "audio", "./audio-to-midi/", t(currentLanguage, "audioTab"), false);
+  ensureNavLink(nav, "audio", audioHref, t(currentLanguage, "audioTab"), false);
   ensureNavLink(nav, "hub", "https://john1912-7.github.io/open-free-tools/", t(currentLanguage, "hubTab"), false);
 }
 
 function ensureNavLink(nav, key, href, text, isActive) {
   let link = nav.querySelector(`[data-nav-link="${key}"]`);
   if (!link) link = nav.querySelector(`a[href="${href}"]`);
+  if (!link && key === "audio") link = nav.querySelector('a[href$="/audio-to-midi/"], a[href="./audio-to-midi/"]');
   if (!link && key === "hub") link = nav.querySelector('a[href="https://john1912-7.github.io/open-free-tools/"]');
   if (!link) {
     link = document.createElement("a");

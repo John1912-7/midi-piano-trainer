@@ -172,10 +172,12 @@ The report focuses on:
 
 ```bash
 npm install
+npm run dev
 npm test
 ```
 
-The Playwright test command starts a local static server automatically.
+Use `npm run dev` for a quick local preview at `http://127.0.0.1:4173/`.
+The Playwright test command starts its own local static server automatically.
 
 ## Local Backend
 

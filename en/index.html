@@ -83,6 +83,37 @@
         <p data-i18n="seoText">Load MIDI directly in the browser, practice parts with your PC keyboard, and track your timing accuracy.</p>
       </section>
 
+      <section class="project-showcase" aria-label="Open Free Tools project showcase">
+        <div class="project-showcase-header">
+          <p class="eyebrow" data-i18n="showcaseEyebrow">First Open Free Tools project</p>
+          <h2 data-i18n="showcaseTitle">A free showcase for MIDI practice and Audio-to-MIDI experiments</h2>
+          <p data-i18n="showcaseText">MIDI Piano Trainer is ready to try: upload MIDI, hear it on a piano sound, practice with falling notes, and move into the experimental audio-to-MIDI converter.</p>
+        </div>
+        <div class="showcase-grid">
+          <article>
+            <span class="status-pill" data-i18n="showcaseTrainerStatus">Working</span>
+            <h3 data-i18n="showcaseTrainerTitle">MIDI Piano Trainer</h3>
+            <p data-i18n="showcaseTrainerText">MIDI upload, falling notes, track selection, speed control, and playback through the built-in piano.</p>
+          </article>
+          <article>
+            <span class="status-pill beta" data-i18n="showcaseAudioStatus">Beta</span>
+            <h3 data-i18n="showcaseAudioTitle">Audio to MIDI</h3>
+            <p data-i18n="showcaseAudioText">Upload a short piano recording, get a MIDI file, download it, or open it directly in the trainer.</p>
+          </article>
+          <article>
+            <span class="status-pill open" data-i18n="showcaseHubStatus">Open source</span>
+            <h3 data-i18n="showcaseHubTitle">Open Free Tools</h3>
+            <p data-i18n="showcaseHubText">An ecosystem of free tools that people can use, study, and build on.</p>
+          </article>
+        </div>
+        <div class="showcase-actions">
+          <a class="button-link" href="#trainer-workspace" data-i18n="showcaseTryTrainer">Open trainer</a>
+          <a class="button-link" href="./audio-to-midi/" data-i18n="showcaseTryAudio">Try Audio-to-MIDI</a>
+          <a class="text-link" href="https://github.com/John1912-7/midi-piano-trainer" data-i18n="showcaseGithub">GitHub</a>
+          <a class="text-link" href="https://john1912-7.github.io/open-free-tools/" data-i18n="showcaseHub">Open Free Tools</a>
+        </div>
+      </section>
+
       <section class="status-strip" aria-live="polite">
         <div><span class="muted" data-i18n="file">File</span><strong id="songName" data-i18n="notLoaded">not loaded</strong></div>
         <div><span class="muted" data-i18n="notes">Notes</span><strong id="noteCount">0</strong></div>
@@ -91,7 +122,7 @@
         <div><span class="muted" data-i18n="accuracy">Accuracy</span><strong id="accuracy">0%</strong></div>
       </section>
 
-      <section class="stage-wrap">
+      <section class="stage-wrap" id="trainer-workspace">
         <canvas id="pianoRoll" width="1280" height="640"></canvas>
         <div class="empty-state" id="emptyState">
           <h2 data-i18n="emptyTitle">Upload a MIDI file</h2>

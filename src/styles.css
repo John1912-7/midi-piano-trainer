@@ -211,6 +211,108 @@ select {
   line-height: 1.5;
 }
 
+.project-showcase {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: var(--space-3);
+  background:
+    linear-gradient(135deg, rgba(40, 215, 178, 0.12), transparent 34rem),
+    var(--panel);
+}
+
+.project-showcase-header {
+  display: grid;
+  gap: 8px;
+  max-width: 900px;
+}
+
+.project-showcase .eyebrow {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-showcase h2 {
+  max-width: 760px;
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.project-showcase p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.showcase-grid article {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: var(--space-2);
+  background: rgba(13, 15, 18, 0.62);
+}
+
+.showcase-grid h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.status-pill {
+  justify-self: start;
+  border: 1px solid rgba(123, 216, 143, 0.45);
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(123, 216, 143, 0.12);
+  color: var(--good);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.status-pill.beta {
+  border-color: rgba(255, 209, 102, 0.5);
+  background: rgba(255, 209, 102, 0.12);
+  color: var(--accent-2);
+}
+
+.status-pill.open {
+  border-color: rgba(40, 215, 178, 0.45);
+  background: rgba(40, 215, 178, 0.12);
+  color: var(--accent);
+}
+
+.showcase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.text-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
 .feature-link {
   margin-top: 8px;
 }
@@ -940,6 +1042,10 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .showcase-grid {
+    grid-template-columns: 1fr;
+  }
+
   .converter-panel,
   .conversion-result,
   .feedback-panel,
@@ -976,6 +1082,20 @@ select {
 
   .stage-wrap {
     min-height: 360px;
+  }
+
+  .project-showcase {
+    padding: var(--space-2);
+  }
+
+  .project-showcase h2 {
+    font-size: 22px;
+  }
+
+  .showcase-actions .button-link,
+  .showcase-actions .text-link {
+    width: 100%;
+    justify-content: center;
   }
 
   .benchmark-result-actions {
