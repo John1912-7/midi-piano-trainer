@@ -15,7 +15,7 @@ const copy = {
     chooseFile: "Выберите аудиофайл.",
     backendRequired: "Сервис конвертации временно недоступен.",
     checking: "Проверяю сервис конвертации...",
-    checkBackend: "Проверить backend",
+    checkBackend: "Проверить сервис",
     convertIdle: "Сделать MIDI",
     converting: "Конвертация...",
     backendReady: "Сервис конвертации доступен. Можно конвертировать аудио.",
@@ -31,12 +31,20 @@ const copy = {
       "Не удалось передать MIDI в тренажер. Скачайте MIDI и загрузите его вручную.",
     sleeping:
       "Сервис конвертации долго не отвечает. Подождите, пока бесплатный сервер проснется.",
+    longRunning: "Распознавание нот может занять несколько минут на бесплатном сервере.",
+    stillWorking: (elapsed) => `Распознавание еще идет... прошло ${elapsed}.`,
+    recordingMode: "Тип записи",
+    cleanMode: "Чистая запись",
+    balancedMode: "Обычная запись",
+    sensitiveMode: "Тихая или шумная запись",
+    modeHelp:
+      "Обычная запись подходит чаще всего. Режим для шумного аудио может помочь плохим записям, но иногда ухудшает чистые.",
   },
   hy: {
     chooseFile: "Ընտրեք աուդիո ֆայլ:",
     backendRequired: "Փոխարկման ծառայությունը ժամանակավորապես հասանելի չէ:",
     checking: "Ստուգում եմ փոխարկման ծառայությունը...",
-    checkBackend: "Ստուգել backend-ը",
+    checkBackend: "Ստուգել ծառայությունը",
     convertIdle: "Ստեղծել MIDI",
     converting: "Փոխարկում...",
     backendReady: "Փոխարկման ծառայությունը հասանելի է։ Կարելի է փոխարկել աուդիոն:",
@@ -52,12 +60,20 @@ const copy = {
       "Չհաջողվեց փոխանցել MIDI-ն վարժարան։ Ներբեռնեք MIDI-ն և բեռնեք ձեռքով:",
     sleeping:
       "Փոխարկման ծառայությունը երկար չի պատասխանում։ Սպասեք, մինչև անվճար սերվերը արթնանա:",
+    longRunning: "Նոտաների ճանաչումը անվճար սերվերում կարող է մի քանի րոպե տևել:",
+    stillWorking: (elapsed) => `Նոտաների ճանաչումը դեռ ընթանում է... անցել է ${elapsed}:`,
+    recordingMode: "Ձայնագրության տեսակ",
+    cleanMode: "Մաքուր ձայնագրություն",
+    balancedMode: "Սովորական ձայնագրություն",
+    sensitiveMode: "Ցածր կամ աղմկոտ ձայնագրություն",
+    modeHelp:
+      "Սովորական ռեժիմը լավագույնն է մեծ մասի համար։ Աղմկոտ ռեժիմը կարող է օգնել վատ ձայնագրություններին, բայց երբեմն վատացնում է մաքուրները։",
   },
   de: {
     chooseFile: "Waehle eine Audiodatei.",
     backendRequired: "Der Konvertierungsdienst ist gerade nicht erreichbar.",
     checking: "Konvertierungsdienst wird geprueft...",
-    checkBackend: "Backend pruefen",
+    checkBackend: "Dienst pruefen",
     convertIdle: "MIDI erstellen",
     converting: "Konvertierung...",
     backendReady: "Konvertierungsdienst ist erreichbar. Audio kann konvertiert werden.",
@@ -73,12 +89,20 @@ const copy = {
       "MIDI konnte nicht an den Trainer uebergeben werden. Lade die MIDI-Datei herunter und importiere sie manuell.",
     sleeping:
       "Der Konvertierungsdienst antwortet sehr langsam. Warte, bis der kostenlose Server aufwacht.",
+    longRunning: "Die Notenerkennung kann auf kostenlosen Servern einige Minuten dauern.",
+    stillWorking: (elapsed) => `Notenerkennung laeuft noch... vergangen ${elapsed}.`,
+    recordingMode: "Aufnahmetyp",
+    cleanMode: "Saubere Aufnahme",
+    balancedMode: "Normale Aufnahme",
+    sensitiveMode: "Leise oder verrauschte Aufnahme",
+    modeHelp:
+      "Normale Aufnahme passt meistens. Der Modus fuer verrauschte Audios kann helfen, kann saubere Aufnahmen aber verschlechtern.",
   },
   es: {
     chooseFile: "Elige un archivo de audio.",
     backendRequired: "El servicio de conversion no esta disponible ahora.",
     checking: "Comprobando el servicio de conversion...",
-    checkBackend: "Comprobar backend",
+    checkBackend: "Comprobar servicio",
     convertIdle: "Crear MIDI",
     converting: "Convirtiendo...",
     backendReady: "El servicio de conversion esta disponible. Puedes convertir el audio.",
@@ -95,14 +119,20 @@ const copy = {
     sleeping:
       "El servicio de conversion tarda demasiado en responder. Espera a que el servidor gratuito despierte.",
     longRunning:
-      "High-quality Transkun conversion can take several minutes on free servers.",
-    stillWorking: (elapsed) => `Still converting with Transkun... elapsed ${elapsed}.`,
+      "La deteccion de notas puede tardar varios minutos en servidores gratuitos.",
+    stillWorking: (elapsed) => `La deteccion de notas sigue en curso... transcurrido ${elapsed}.`,
+    recordingMode: "Tipo de grabacion",
+    cleanMode: "Grabacion limpia",
+    balancedMode: "Grabacion normal",
+    sensitiveMode: "Grabacion baja o con ruido",
+    modeHelp:
+      "Grabacion normal funciona mejor la mayoria de las veces. El modo para ruido puede ayudar con audios malos, pero puede empeorar grabaciones limpias.",
   },
   en: {
     chooseFile: "Choose an audio file.",
     backendRequired: "The conversion service is temporarily unavailable.",
     checking: "Checking conversion service...",
-    checkBackend: "Check backend",
+    checkBackend: "Check service",
     convertIdle: "Create MIDI",
     converting: "Converting...",
     backendReady: "Conversion service is reachable. You can convert audio now.",
@@ -119,8 +149,14 @@ const copy = {
     sleeping:
       "Conversion service is taking too long to respond. Wait while the free server wakes up.",
     longRunning:
-      "High-quality Transkun conversion can take several minutes on free servers.",
-    stillWorking: (elapsed) => `Still converting with Transkun... elapsed ${elapsed}.`,
+      "Note detection can take several minutes on free servers.",
+    stillWorking: (elapsed) => `Still detecting notes... elapsed ${elapsed}.`,
+    recordingMode: "Recording type",
+    cleanMode: "Clean recording",
+    balancedMode: "Normal recording",
+    sensitiveMode: "Quiet or noisy recording",
+    modeHelp:
+      "Normal recording is safest. The noisy-audio mode can help rough files, but may hurt clean recordings.",
   },
 };
 
@@ -430,15 +466,15 @@ function ensureQualityControl() {
   label.className = "quality-control";
 
   const labelText = document.createElement("span");
-  labelText.textContent = "Quality";
+  labelText.textContent = text.recordingMode || copy.en.recordingMode;
 
   const select = document.createElement("select");
   select.id = "qualityPreset";
 
   for (const [value, labelValue] of [
-    ["clean", "Clean - no preprocessing"],
-    ["balanced", "Balanced - normalize"],
-    ["sensitive", "Sensitive - experimental rescue"],
+    ["clean", text.cleanMode || copy.en.cleanMode],
+    ["balanced", text.balancedMode || copy.en.balancedMode],
+    ["sensitive", text.sensitiveMode || copy.en.sensitiveMode],
   ]) {
     const option = document.createElement("option");
     option.value = value;
@@ -447,7 +483,7 @@ function ensureQualityControl() {
   }
 
   const help = document.createElement("small");
-  help.textContent = "Balanced is safest. Sensitive may help very noisy audio, but can hurt clean recordings.";
+  help.textContent = text.modeHelp || copy.en.modeHelp;
 
   label.append(labelText, select, help);
   controls.insertBefore(label, elements.convert);

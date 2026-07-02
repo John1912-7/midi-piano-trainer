@@ -58,7 +58,7 @@
           <p>Short clean single-instrument recordings work best. The free beta can take a few minutes while it detects notes. MVP limit: <strong id="audioLimitLabel">25 MB</strong>.</p>
         </div>
         <label class="backend-url-control" hidden>
-          <span>Backend API URL</span>
+          <span>Advanced service URL</span>
           <input id="backendUrl" type="url" placeholder="https://vanya1912-midi-piano-trainer-backend.hf.space" autocomplete="url" />
         </label>
         <div class="selected-file-card" aria-label="Selected file">
@@ -68,7 +68,7 @@
         </div>
         <div class="converter-controls">
           <label class="file-button audio-file-button"><input id="audioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a,audio/*" /><span>Choose audio</span></label>
-          <button id="checkBackendButton" type="button" disabled hidden>Check backend</button>
+          <button id="checkBackendButton" type="button" disabled hidden>Check service</button>
           <button id="convertAudioButton" type="button" disabled>Create MIDI</button>
         </div>
         <div class="conversion-state">
@@ -91,7 +91,7 @@
         <div>
           <p class="eyebrow">Help improve the converter</p>
           <h2>Bad result? Send feedback</h2>
-          <p>Share what went wrong, the audio type, quality profile, and a generated MIDI if you can. Real feedback is what helps us improve the open-source model path.</p>
+          <p>Share what went wrong, the audio type, which recording mode was selected, and a generated MIDI if you can. Real feedback is what helps us improve the open-source recognition path.</p>
         </div>
         <a class="button-link" href="https://github.com/John1912-7/midi-piano-trainer/issues/new?template=audio-conversion-feedback.yml">Report bad conversion</a>
       </section>
