@@ -114,6 +114,27 @@
         </div>
       </section>
 
+      <section class="trainer-guide" aria-label="So nutzt du den MIDI Piano Trainer">
+        <div>
+          <h2 data-i18n="guideTitle">So nutzt du den Trainer</h2>
+          <p data-i18n="guideTip">Alles laeuft im Browser: Die MIDI-Datei muss nicht an einen Server gesendet werden.</p>
+        </div>
+        <ol class="guide-steps">
+          <li>
+            <strong data-i18n="guideUploadTitle">1. MIDI laden</strong>
+            <span data-i18n="guideUploadText">Jede .mid oder .midi Datei funktioniert. Wenn du nur eine Klavieraufnahme hast, probiere zuerst Audio-to-MIDI.</span>
+          </li>
+          <li>
+            <strong data-i18n="guideListenTitle">2. Ergebnis anhoeren</strong>
+            <span data-i18n="guideListenText">Druecke Listen, um MIDI mit dem eingebauten Klavier zu hoeren, oder Play fuer fallende Noten.</span>
+          </li>
+          <li>
+            <strong data-i18n="guidePracticeTitle">3. Den richtigen Part ueben</strong>
+            <span data-i18n="guidePracticeText">Waehle eine Spur, stelle das Tempo ein und spiele mit den Tasten, die auf der virtuellen Tastatur markiert sind.</span>
+          </li>
+        </ol>
+      </section>
+
       <section class="status-strip" aria-live="polite">
         <div><span class="muted" data-i18n="file">Datei</span><strong id="songName" data-i18n="notLoaded">nicht geladen</strong></div>
         <div><span class="muted" data-i18n="notes">Noten</span><strong id="noteCount">0</strong></div>
@@ -125,8 +146,12 @@
       <section class="stage-wrap" id="trainer-workspace">
         <canvas id="pianoRoll" width="1280" height="640"></canvas>
         <div class="empty-state" id="emptyState">
-          <h2 data-i18n="emptyTitle">MIDI-Datei laden</h2>
-          <p data-i18n="emptyText">Die Noten erscheinen oben und fallen zur Anschlagslinie.</p>
+          <h2 data-i18n="emptyTitle">Starte mit einer MIDI-Datei</h2>
+          <p data-i18n="emptyText">Lade eine .mid oder .midi Datei. Danach kannst du Listen druecken, um das Klavier zu hoeren, oder Play, um mit fallenden Noten zu ueben.</p>
+          <div class="empty-state-actions">
+            <label class="button-link" for="midiFile" data-i18n="emptyUpload">MIDI laden</label>
+            <a class="text-link" href="./audio-to-midi/" data-i18n="emptyAudioLink">Ich habe nur Audio</a>
+          </div>
         </div>
       </section>
 

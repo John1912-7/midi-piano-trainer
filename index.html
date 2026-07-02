@@ -119,6 +119,27 @@
         </div>
       </section>
 
+      <section class="trainer-guide" aria-label="Как пользоваться тренажером">
+        <div>
+          <h2 data-i18n="guideTitle">Как пользоваться тренажером</h2>
+          <p data-i18n="guideTip">Все работает в браузере: MIDI-файл не нужно отправлять на сервер.</p>
+        </div>
+        <ol class="guide-steps">
+          <li>
+            <strong data-i18n="guideUploadTitle">1. Загрузи MIDI</strong>
+            <span data-i18n="guideUploadText">Подойдет любой .mid или .midi файл. Если есть только запись пианино, сначала попробуй Audio-to-MIDI.</span>
+          </li>
+          <li>
+            <strong data-i18n="guideListenTitle">2. Послушай результат</strong>
+            <span data-i18n="guideListenText">Нажми Listen, чтобы услышать MIDI на встроенном пианино, или Play, чтобы запустить падающие ноты.</span>
+          </li>
+          <li>
+            <strong data-i18n="guidePracticeTitle">3. Тренируй нужную партию</strong>
+            <span data-i18n="guidePracticeText">Выбери дорожку, настрой скорость и играй по клавишам, подсвеченным на виртуальной клавиатуре.</span>
+          </li>
+        </ol>
+      </section>
+
       <section class="status-strip" aria-live="polite">
         <div><span class="muted" data-i18n="file">Файл</span><strong id="songName" data-i18n="notLoaded">не загружен</strong></div>
         <div><span class="muted" data-i18n="notes">Нот</span><strong id="noteCount">0</strong></div>
@@ -130,8 +151,12 @@
       <section class="stage-wrap" id="trainer-workspace">
         <canvas id="pianoRoll" width="1280" height="640"></canvas>
         <div class="empty-state" id="emptyState">
-          <h2 data-i18n="emptyTitle">Загрузи MIDI-файл</h2>
-          <p data-i18n="emptyText">Ноты появятся сверху и будут падать к линии нажатия.</p>
+          <h2 data-i18n="emptyTitle">Начни с MIDI-файла</h2>
+          <p data-i18n="emptyText">Загрузи .mid или .midi файл. После загрузки можно нажать Listen, чтобы услышать пианино, или Play, чтобы тренироваться по падающим нотам.</p>
+          <div class="empty-state-actions">
+            <label class="button-link" for="midiFile" data-i18n="emptyUpload">Загрузить MIDI</label>
+            <a class="text-link" href="./ru/audio-to-midi/" data-i18n="emptyAudioLink">У меня есть только аудио</a>
+          </div>
         </div>
       </section>
 

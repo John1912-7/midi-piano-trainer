@@ -313,6 +313,54 @@ select {
   text-decoration: underline;
 }
 
+.trainer-guide {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(420px, 1.4fr);
+  gap: var(--space-3);
+  align-items: start;
+  margin: var(--space-3) 0 var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: var(--space-3);
+  background: rgba(24, 27, 31, 0.72);
+}
+
+.trainer-guide h2 {
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.trainer-guide p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-steps li {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  border-left: 3px solid var(--accent);
+  padding-left: var(--space-2);
+}
+
+.guide-steps strong {
+  color: #f4f7f8;
+}
+
+.guide-steps span {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .feature-link {
   margin-top: 8px;
 }
@@ -332,11 +380,14 @@ select {
 .site-tabs {
   display: flex;
   gap: 8px;
+  overflow-x: auto;
   margin: 16px 0 24px;
   border-bottom: 1px solid var(--line);
+  scrollbar-width: thin;
 }
 
 .site-tabs a {
+  flex: 0 0 auto;
   display: inline-flex;
   min-height: 42px;
   align-items: center;
@@ -411,12 +462,37 @@ select {
   display: grid;
   place-content: center;
   gap: 8px;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: var(--space-3);
   text-align: center;
   pointer-events: none;
 }
 
 .empty-state.hidden {
   display: none;
+}
+
+.empty-state h2 {
+  font-size: 28px;
+}
+
+.empty-state p {
+  max-width: 520px;
+  line-height: 1.6;
+}
+
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-top: var(--space-2);
+  pointer-events: auto;
+}
+
+.empty-state-actions .button-link {
+  cursor: pointer;
 }
 
 .keyboard-panel {
@@ -1046,6 +1122,11 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .trainer-guide,
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+
   .converter-panel,
   .conversion-result,
   .feedback-panel,
@@ -1092,8 +1173,18 @@ select {
     font-size: 22px;
   }
 
+  .empty-state {
+    padding: var(--space-2);
+  }
+
+  .empty-state h2 {
+    font-size: 22px;
+  }
+
   .showcase-actions .button-link,
-  .showcase-actions .text-link {
+  .showcase-actions .text-link,
+  .empty-state-actions .button-link,
+  .empty-state-actions .text-link {
     width: 100%;
     justify-content: center;
   }

@@ -61,6 +61,9 @@ test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ 
   await expect(page.locator(".project-showcase")).toContainText("MIDI Piano Trainer");
   await expect(page.locator(".project-showcase a[href*='audio-to-midi/']")).toBeVisible();
   await expect(page.locator(".site-tabs a[href*='audio-to-midi/']")).toHaveCount(1);
+  await expect(page.locator(".trainer-guide")).toBeVisible();
+  await expect(page.locator(".trainer-guide li")).toHaveCount(3);
+  await expect(page.locator('.empty-state label[for="midiFile"]')).toBeVisible();
 
   await page.locator("#midiFile").setInputFiles({
     name: "lane-test.mid",

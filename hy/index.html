@@ -114,6 +114,27 @@
         </div>
       </section>
 
+      <section class="trainer-guide" aria-label="Ինչպես օգտվել MIDI Piano Trainer-ից">
+        <div>
+          <h2 data-i18n="guideTitle">Ինչպես օգտվել վարժարանից</h2>
+          <p data-i18n="guideTip">Ամեն ինչ աշխատում է բրաուզերում. MIDI ֆայլը պետք չէ ուղարկել սերվեր:</p>
+        </div>
+        <ol class="guide-steps">
+          <li>
+            <strong data-i18n="guideUploadTitle">1. Բեռնեք MIDI</strong>
+            <span data-i18n="guideUploadText">Կարելի է օգտագործել ցանկացած .mid կամ .midi ֆայլ: Եթե ունեք միայն դաշնամուրի ձայնագրություն, նախ փորձեք Audio-to-MIDI:</span>
+          </li>
+          <li>
+            <strong data-i18n="guideListenTitle">2. Լսեք արդյունքը</strong>
+            <span data-i18n="guideListenText">Սեղմեք Listen՝ MIDI-ն ներկառուցված դաշնամուրով լսելու համար, կամ Play՝ ընկնող նոտաները սկսելու համար:</span>
+          </li>
+          <li>
+            <strong data-i18n="guidePracticeTitle">3. Պարապեք անհրաժեշտ պարտիան</strong>
+            <span data-i18n="guidePracticeText">Ընտրեք տրեկը, կարգավորեք արագությունը եւ նվագեք վիրտուալ ստեղնաշարի նշած կոճակներով:</span>
+          </li>
+        </ol>
+      </section>
+
       <section class="status-strip" aria-live="polite">
         <div><span class="muted" data-i18n="file">Ֆայլ</span><strong id="songName" data-i18n="notLoaded">չի ներբեռնվել</strong></div>
         <div><span class="muted" data-i18n="notes">Նոտաներ</span><strong id="noteCount">0</strong></div>
@@ -125,8 +146,12 @@
       <section class="stage-wrap" id="trainer-workspace">
         <canvas id="pianoRoll" width="1280" height="640"></canvas>
         <div class="empty-state" id="emptyState">
-          <h2 data-i18n="emptyTitle">Ներբեռնեք MIDI ֆայլ</h2>
-          <p data-i18n="emptyText">Նոտաները կհայտնվեն վերևից և կընկնեն սեղմման գծի ուղղությամբ:</p>
+          <h2 data-i18n="emptyTitle">Սկսեք MIDI ֆայլից</h2>
+          <p data-i18n="emptyText">Բեռնեք .mid կամ .midi ֆայլ: Բեռնելուց հետո սեղմեք Listen՝ դաշնամուրով լսելու համար, կամ Play՝ ընկնող նոտաներով պարապելու համար:</p>
+          <div class="empty-state-actions">
+            <label class="button-link" for="midiFile" data-i18n="emptyUpload">Բեռնել MIDI</label>
+            <a class="text-link" href="./audio-to-midi/" data-i18n="emptyAudioLink">Ես միայն աուդիո ունեմ</a>
+          </div>
         </div>
       </section>
 

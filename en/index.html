@@ -114,6 +114,27 @@
         </div>
       </section>
 
+      <section class="trainer-guide" aria-label="How to use MIDI Piano Trainer">
+        <div>
+          <h2 data-i18n="guideTitle">How to use the trainer</h2>
+          <p data-i18n="guideTip">Everything runs in the browser: your MIDI file does not need to be sent to a server.</p>
+        </div>
+        <ol class="guide-steps">
+          <li>
+            <strong data-i18n="guideUploadTitle">1. Upload MIDI</strong>
+            <span data-i18n="guideUploadText">Any .mid or .midi file works. If you only have a piano recording, try Audio-to-MIDI first.</span>
+          </li>
+          <li>
+            <strong data-i18n="guideListenTitle">2. Hear the result</strong>
+            <span data-i18n="guideListenText">Press Listen to hear the MIDI through the built-in piano, or Play to start the falling notes.</span>
+          </li>
+          <li>
+            <strong data-i18n="guidePracticeTitle">3. Practice the right part</strong>
+            <span data-i18n="guidePracticeText">Choose a track, adjust the speed, and play using the keys highlighted on the virtual keyboard.</span>
+          </li>
+        </ol>
+      </section>
+
       <section class="status-strip" aria-live="polite">
         <div><span class="muted" data-i18n="file">File</span><strong id="songName" data-i18n="notLoaded">not loaded</strong></div>
         <div><span class="muted" data-i18n="notes">Notes</span><strong id="noteCount">0</strong></div>
@@ -125,8 +146,12 @@
       <section class="stage-wrap" id="trainer-workspace">
         <canvas id="pianoRoll" width="1280" height="640"></canvas>
         <div class="empty-state" id="emptyState">
-          <h2 data-i18n="emptyTitle">Upload a MIDI file</h2>
-          <p data-i18n="emptyText">Notes will appear above and fall toward the hit line.</p>
+          <h2 data-i18n="emptyTitle">Start with a MIDI file</h2>
+          <p data-i18n="emptyText">Upload a .mid or .midi file. After it loads, press Listen to hear the piano or Play to practice with falling notes.</p>
+          <div class="empty-state-actions">
+            <label class="button-link" for="midiFile" data-i18n="emptyUpload">Upload MIDI</label>
+            <a class="text-link" href="./audio-to-midi/" data-i18n="emptyAudioLink">I only have audio</a>
+          </div>
         </div>
       </section>
 
