@@ -254,6 +254,9 @@ test("opens the public audio-to-midi page with automatic conversion service", as
   await expect(page.getByRole("heading", { name: "Бесплатный конвертер аудио в MIDI" })).toBeVisible();
   await expect(page.locator("#backendUrl")).toBeAttached();
   await expect(page.locator("#backendUrl")).toBeHidden();
+  await expect(page.locator("#serviceNote")).toBeVisible();
+  await expect(page.locator("#serviceNote")).toContainText("Официальный сервис");
+  await expect(page.locator("#serviceNote")).toContainText("автоматически");
   await expect(page.locator("#audioFile")).toBeAttached();
   await expect(page.locator("#qualityPreset")).toHaveValue("balanced");
   await expect(page.getByRole("link", { name: /Сообщить|Report bad conversion/ })).toHaveAttribute(
@@ -274,6 +277,22 @@ test("opens the public audio-to-midi page with automatic conversion service", as
   await expect(page.locator("#convertAudioButton")).toBeEnabled();
   await expect(page.locator("#conversionStatus")).toContainText("test-tone.wav");
   expect(errors).toEqual([]);
+});
+
+test("keeps backend URL controls behind advanced mode only", async ({ page }) => {
+  await page.goto("/en/audio-to-midi/");
+
+  await expect(page.locator("#serviceNote")).toContainText("Official service");
+  await expect(page.locator("#backendUrl")).toBeHidden();
+  await expect(page.locator("#checkBackendButton")).toBeHidden();
+
+  await page.goto("/en/audio-to-midi/?advanced=1");
+
+  await expect(page.locator("#serviceNote")).toContainText("Advanced mode");
+  await expect(page.locator("#serviceNote")).toContainText("Public users do not choose a backend");
+  await expect(page.locator("#backendUrl")).toBeVisible();
+  await expect(page.locator("#backendUrl")).toHaveValue(DEFAULT_BACKEND_URL);
+  await expect(page.locator("#checkBackendButton")).toBeVisible();
 });
 
 test("shows friendly audio validation errors before conversion", async ({ page }) => {

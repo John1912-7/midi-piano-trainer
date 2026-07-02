@@ -16,6 +16,10 @@ const copy = {
     backendRequired: "Сервис конвертации временно недоступен.",
     checking: "Проверяю сервис конвертации...",
     checkBackend: "Проверить сервис",
+    serviceTitle: "Официальный сервис",
+    serviceText: "Audio-to-MIDI использует официальный бесплатный сервис автоматически. Ничего настраивать не нужно.",
+    advancedServiceTitle: "Advanced режим",
+    advancedServiceText: "Режим для локального тестирования и benchmark-задач. Публичным пользователям не нужно выбирать backend.",
     convertIdle: "Сделать MIDI",
     converting: "Конвертация...",
     backendReady: "Сервис конвертации доступен. Можно конвертировать аудио.",
@@ -52,11 +56,11 @@ const copy = {
     tryAgain: "Попробовать еще раз",
     stoppedStatus: "Ожидание остановлено. Можно запустить новую конвертацию.",
     stoppedJob: "Ожидание остановлено в этом браузере. Задача на сервере может еще завершиться.",
-    uploadJob: "Загружаю аудио. ",
+    uploadJob: "Загружаю аудио в официальный сервис. ",
     directJob: "Очередь временно недоступна. Конвертирую напрямую. ",
     doneJob: "MIDI готов. Скачайте его или откройте в тренажере.",
-    queuedJob: "Файл в очереди. Ждем свободный бесплатный сервер...",
-    processingJob: "Распознаю ноты и создаю MIDI. Держите страницу открытой.",
+    queuedJob: "Файл в очереди официального бесплатного сервиса. Ждем свободный сервер...",
+    processingJob: "Официальный сервис распознает ноты и создает MIDI. Держите страницу открытой.",
     downloadingJob: "Конвертация завершена. Получаю MIDI...",
     preparingJob: "Готовлю конвертацию...",
     taskId: "Задача",
@@ -79,6 +83,10 @@ const copy = {
     backendRequired: "Փոխարկման ծառայությունը ժամանակավորապես հասանելի չէ:",
     checking: "Ստուգում եմ փոխարկման ծառայությունը...",
     checkBackend: "Ստուգել ծառայությունը",
+    serviceTitle: "Պաշտոնական ծառայություն",
+    serviceText: "Audio-to-MIDI-ն ավտոմատ օգտագործում է պաշտոնական անվճար ծառայությունը: Կարգավորում պետք չէ:",
+    advancedServiceTitle: "Advanced ռեժիմ",
+    advancedServiceText: "Ռեժիմը նախատեսված է local testing-ի եւ benchmark workflow-ի համար: Public users-ը backend չի ընտրում:",
     convertIdle: "Ստեղծել MIDI",
     converting: "Փոխարկում...",
     backendReady: "Փոխարկման ծառայությունը հասանելի է։ Կարելի է փոխարկել աուդիոն:",
@@ -115,11 +123,11 @@ const copy = {
     tryAgain: "Փորձել նորից",
     stoppedStatus: "Սպասումը դադարեցվեց։ Կարող եք սկսել նոր փոխարկում։",
     stoppedJob: "Սպասումը դադարեցվեց այս բրաուզերում։ Սերվերի առաջադրանքը կարող է դեռ ավարտվել։",
-    uploadJob: "Բեռնում եմ աուդիոն։ ",
+    uploadJob: "Բեռնում եմ աուդիոն պաշտոնական ծառայություն։ ",
     directJob: "Հերթը ժամանակավորապես հասանելի չէ։ Փոխարկում եմ ուղիղ։ ",
     doneJob: "MIDI-ն պատրաստ է։ Ներբեռնեք կամ բացեք վարժարանում։",
-    queuedJob: "Ֆայլը հերթում է։ Սպասում ենք անվճար սերվերին...",
-    processingJob: "Ճանաչում եմ նոտաները և ստեղծում MIDI։ Էջը բաց պահեք։",
+    queuedJob: "Ֆայլը պաշտոնական անվճար ծառայության հերթում է։ Սպասում ենք սերվերին...",
+    processingJob: "Պաշտոնական ծառայությունը ճանաչում է նոտաները և ստեղծում MIDI։ Էջը բաց պահեք։",
     downloadingJob: "Փոխարկումն ավարտվեց։ Ստանում եմ MIDI-ն...",
     preparingJob: "Պատրաստում եմ փոխարկումը...",
     taskId: "Առաջադրանք",
@@ -142,6 +150,10 @@ const copy = {
     backendRequired: "Der Konvertierungsdienst ist gerade nicht erreichbar.",
     checking: "Konvertierungsdienst wird geprueft...",
     checkBackend: "Dienst pruefen",
+    serviceTitle: "Offizieller Dienst",
+    serviceText: "Audio-to-MIDI nutzt automatisch den offiziellen kostenlosen Dienst. Du musst nichts einrichten.",
+    advancedServiceTitle: "Advanced-Modus",
+    advancedServiceText: "Nur fuer lokale Tests und Benchmark-Arbeit. Oeffentliche Nutzer waehlen kein Backend aus.",
     convertIdle: "MIDI erstellen",
     converting: "Konvertierung...",
     backendReady: "Konvertierungsdienst ist erreichbar. Audio kann konvertiert werden.",
@@ -178,11 +190,11 @@ const copy = {
     tryAgain: "Erneut versuchen",
     stoppedStatus: "Warten gestoppt. Du kannst eine neue Konvertierung starten.",
     stoppedJob: "Warten wurde in diesem Browser gestoppt. Die Serveraufgabe kann noch fertig werden.",
-    uploadJob: "Audio wird hochgeladen. ",
+    uploadJob: "Audio wird zum offiziellen Dienst hochgeladen. ",
     directJob: "Warteschlange ist gerade nicht verfuegbar. Direkte Konvertierung. ",
     doneJob: "MIDI ist fertig. Lade es herunter oder oeffne es im Trainer.",
-    queuedJob: "Datei ist in der Warteschlange. Kostenloser Server wird frei...",
-    processingJob: "Noten werden erkannt und MIDI wird erstellt. Lass die Seite offen.",
+    queuedJob: "Datei ist in der Warteschlange des offiziellen kostenlosen Dienstes. Server wird frei...",
+    processingJob: "Der offizielle Dienst erkennt Noten und erstellt MIDI. Lass die Seite offen.",
     downloadingJob: "Konvertierung fertig. MIDI wird geladen...",
     preparingJob: "Konvertierung wird vorbereitet...",
     taskId: "Aufgabe",
@@ -205,6 +217,10 @@ const copy = {
     backendRequired: "El servicio de conversion no esta disponible ahora.",
     checking: "Comprobando el servicio de conversion...",
     checkBackend: "Comprobar servicio",
+    serviceTitle: "Servicio oficial",
+    serviceText: "Audio-to-MIDI usa automaticamente el servicio gratuito oficial. No tienes que configurar nada.",
+    advancedServiceTitle: "Modo avanzado",
+    advancedServiceText: "Solo para pruebas locales y benchmarks. Los usuarios publicos no eligen backend.",
     convertIdle: "Crear MIDI",
     converting: "Convirtiendo...",
     backendReady: "El servicio de conversion esta disponible. Puedes convertir el audio.",
@@ -242,11 +258,11 @@ const copy = {
     tryAgain: "Intentar otra vez",
     stoppedStatus: "Espera detenida. Puedes iniciar una nueva conversion.",
     stoppedJob: "La espera se detuvo en este navegador. La tarea del servidor puede terminar despues.",
-    uploadJob: "Subiendo audio. ",
+    uploadJob: "Subiendo audio al servicio oficial. ",
     directJob: "La cola no esta disponible ahora. Convirtiendo directamente. ",
     doneJob: "MIDI listo. Descargalo o abrelo en el entrenador.",
-    queuedJob: "Archivo en cola. Esperando el servidor gratuito...",
-    processingJob: "Detectando notas y creando MIDI. Mantén esta pagina abierta.",
+    queuedJob: "Archivo en cola en el servicio gratuito oficial. Esperando servidor...",
+    processingJob: "El servicio oficial detecta notas y crea MIDI. Mantén esta pagina abierta.",
     downloadingJob: "Conversion terminada. Descargando MIDI...",
     preparingJob: "Preparando conversion...",
     taskId: "Tarea",
@@ -269,6 +285,10 @@ const copy = {
     backendRequired: "The conversion service is temporarily unavailable.",
     checking: "Checking conversion service...",
     checkBackend: "Check service",
+    serviceTitle: "Official service",
+    serviceText: "Audio-to-MIDI uses the official free conversion service automatically. No backend setup is needed.",
+    advancedServiceTitle: "Advanced mode",
+    advancedServiceText: "For local testing and benchmark work only. Public users do not choose a backend.",
     convertIdle: "Create MIDI",
     converting: "Converting...",
     backendReady: "Conversion service is reachable. You can convert audio now.",
@@ -306,11 +326,11 @@ const copy = {
     tryAgain: "Try again",
     stoppedStatus: "Stopped waiting. You can start a new conversion when ready.",
     stoppedJob: "Stopped waiting in this browser. The server task may still finish in the background.",
-    uploadJob: "Uploading your audio. ",
+    uploadJob: "Uploading your audio to the official service. ",
     directJob: "Conversion queue is not available yet. Converting directly. ",
     doneJob: "MIDI is ready. Download it or open it in the trainer.",
-    queuedJob: "Task is queued. Waiting for the free server...",
-    processingJob: "Detecting notes and creating MIDI. Keep this page open.",
+    queuedJob: "Task is queued on the official free service. Waiting for the server...",
+    processingJob: "The official service is detecting notes and creating MIDI. Keep this page open.",
     downloadingJob: "Conversion finished. Downloading MIDI...",
     preparingJob: "Preparing conversion...",
     taskId: "Task",
@@ -368,6 +388,7 @@ let jobPanel = null;
 ensureQualityControl();
 ensureJobPanel();
 configureBackendControls();
+ensureServiceNote();
 if (elements.quality) elements.quality.value = localStorage.getItem(QUALITY_PRESET_KEY) || "balanced";
 if (elements.limitLabel) elements.limitLabel.textContent = `${MAX_AUDIO_MB} MB / ${MAX_AUDIO_SECONDS}s`;
 if (elements.languageSelect) elements.languageSelect.value = language;
@@ -616,6 +637,30 @@ function configureBackendControls() {
   const backendControl = elements.backendUrl.closest(".backend-url-control");
   if (backendControl) backendControl.hidden = !isAdvancedBackendMode;
   if (elements.checkBackend) elements.checkBackend.hidden = !isAdvancedBackendMode;
+}
+
+function ensureServiceNote() {
+  const panel = document.querySelector(".converter-panel");
+  const selectedFileCard = document.querySelector(".selected-file-card");
+  if (!panel || !selectedFileCard || document.querySelector("#serviceNote")) return;
+
+  const note = document.createElement("div");
+  note.id = "serviceNote";
+  note.className = "service-note";
+  note.dataset.mode = isAdvancedBackendMode ? "advanced" : "official";
+
+  const title = document.createElement("strong");
+  title.textContent = isAdvancedBackendMode
+    ? text.advancedServiceTitle || copy.en.advancedServiceTitle
+    : text.serviceTitle || copy.en.serviceTitle;
+
+  const message = document.createElement("p");
+  message.textContent = isAdvancedBackendMode
+    ? text.advancedServiceText || copy.en.advancedServiceText
+    : text.serviceText || copy.en.serviceText;
+
+  note.append(title, message);
+  panel.insertBefore(note, selectedFileCard);
 }
 
 function getBackendUrl() {
