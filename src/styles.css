@@ -427,6 +427,7 @@ select {
 
 .planning-grid article,
 .decision-panel,
+.audio-fit-panel,
 .converter-panel,
 .youtube-note {
   border: 1px solid var(--line);
@@ -436,6 +437,7 @@ select {
 }
 
 .planning-grid h2,
+.audio-fit-panel h2,
 .decision-panel h2 {
   margin-bottom: 10px;
   font-size: 18px;
@@ -443,6 +445,24 @@ select {
 
 .decision-panel {
   margin-top: var(--space-2);
+}
+
+.audio-fit-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.audio-fit-panel ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.audio-fit-panel li + li {
+  margin-top: 6px;
 }
 
 .converter-panel {
@@ -922,7 +942,8 @@ select {
 
   .converter-panel,
   .conversion-result,
-  .feedback-panel {
+  .feedback-panel,
+  .audio-fit-panel {
     grid-template-columns: 1fr;
   }
 

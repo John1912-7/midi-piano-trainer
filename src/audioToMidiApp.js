@@ -20,7 +20,11 @@ const copy = {
     converting: "Конвертация...",
     backendReady: "Сервис конвертации доступен. Можно конвертировать аудио.",
     backendError: "Сервис конвертации не отвечает.",
-    fileTooLarge: (limit) => `Файл слишком большой для MVP. Ограничение: ${limit} MB.`,
+    fileTooLarge: (limit) => `Файл слишком большой. Максимум ${limit} MB.`,
+    fileTooLong: (limit) => `Аудио слишком длинное для beta-версии. Максимум ${limit} секунд.`,
+    unsupportedFile: "Похоже, этот формат не поддерживается. Попробуйте MP3, WAV, OGG, FLAC или M4A.",
+    conversionFailed: "Не удалось распознать ноты. Попробуйте короткую чистую запись одного инструмента.",
+    serviceUnavailable: "Сервис конвертации сейчас недоступен. Попробуйте еще раз через минуту.",
     fileSelected: (name) => `Файл выбран: ${name}`,
     sending: "Загружаю аудио для конвертации...",
     backendStatus: (status) => `Сервис конвертации вернул ошибку ${status}.`,
@@ -39,6 +43,36 @@ const copy = {
     sensitiveMode: "Тихая или шумная запись",
     modeHelp:
       "Обычная запись подходит чаще всего. Режим для шумного аудио может помочь плохим записям, но иногда ухудшает чистые.",
+    conversionTask: "Задача конвертации",
+    uploadStep: "Загрузка",
+    queueStep: "Очередь",
+    convertStep: "Распознавание",
+    readyStep: "Готово",
+    stopWaiting: "Остановить ожидание",
+    tryAgain: "Попробовать еще раз",
+    stoppedStatus: "Ожидание остановлено. Можно запустить новую конвертацию.",
+    stoppedJob: "Ожидание остановлено в этом браузере. Задача на сервере может еще завершиться.",
+    uploadJob: "Загружаю аудио. ",
+    directJob: "Очередь временно недоступна. Конвертирую напрямую. ",
+    doneJob: "MIDI готов. Скачайте его или откройте в тренажере.",
+    queuedJob: "Файл в очереди. Ждем свободный бесплатный сервер...",
+    processingJob: "Распознаю ноты и создаю MIDI. Держите страницу открытой.",
+    downloadingJob: "Конвертация завершена. Получаю MIDI...",
+    preparingJob: "Готовлю конвертацию...",
+    taskId: "Задача",
+    estimatedWait: "Примерное ожидание",
+    approxRemaining: "Осталось примерно",
+    roughRemaining: "Грубая оценка",
+    takingLonger: "Идет дольше обычного. Бесплатный сервер может все еще работать.",
+    idleBadge: "Ожидание",
+    uploadingBadge: "Загрузка",
+    queuedBadge: "В очереди",
+    processingBadge: "В работе",
+    downloadingBadge: "Получение",
+    readyBadge: "Готово",
+    failedBadge: "Ошибка",
+    stoppedBadge: "Остановлено",
+    workingBadge: "Работаю",
   },
   hy: {
     chooseFile: "Ընտրեք աուդիո ֆայլ:",
@@ -49,7 +83,11 @@ const copy = {
     converting: "Փոխարկում...",
     backendReady: "Փոխարկման ծառայությունը հասանելի է։ Կարելի է փոխարկել աուդիոն:",
     backendError: "Փոխարկման ծառայությունը չի պատասխանում:",
-    fileTooLarge: (limit) => `Ֆայլը շատ մեծ է MVP-ի համար։ Սահմանափակում՝ ${limit} MB։`,
+    fileTooLarge: (limit) => `Ֆայլը շատ մեծ է։ Առավելագույնը՝ ${limit} MB։`,
+    fileTooLong: (limit) => `Աուդիոն շատ երկար է beta-ի համար։ Առավելագույնը՝ ${limit} վայրկյան։`,
+    unsupportedFile: "Այս ձևաչափը կարծես չի աջակցվում։ Փորձեք MP3, WAV, OGG, FLAC կամ M4A։",
+    conversionFailed: "Չհաջողվեց ճանաչել նոտաները։ Փորձեք կարճ և մաքուր մեկ գործիքի ձայնագրություն։",
+    serviceUnavailable: "Փոխարկման ծառայությունը հիմա հասանելի չէ։ Փորձեք մեկ րոպեից։",
     fileSelected: (name) => `Ընտրված ֆայլ՝ ${name}`,
     sending: "Բեռնում եմ աուդիոն փոխարկման համար...",
     backendStatus: (status) => `Փոխարկման ծառայությունը վերադարձրել է սխալ ${status}։`,
@@ -68,6 +106,36 @@ const copy = {
     sensitiveMode: "Ցածր կամ աղմկոտ ձայնագրություն",
     modeHelp:
       "Սովորական ռեժիմը լավագույնն է մեծ մասի համար։ Աղմկոտ ռեժիմը կարող է օգնել վատ ձայնագրություններին, բայց երբեմն վատացնում է մաքուրները։",
+    conversionTask: "Փոխարկման առաջադրանք",
+    uploadStep: "Բեռնում",
+    queueStep: "Հերթ",
+    convertStep: "Ճանաչում",
+    readyStep: "Պատրաստ",
+    stopWaiting: "Դադարեցնել սպասումը",
+    tryAgain: "Փորձել նորից",
+    stoppedStatus: "Սպասումը դադարեցվեց։ Կարող եք սկսել նոր փոխարկում։",
+    stoppedJob: "Սպասումը դադարեցվեց այս բրաուզերում։ Սերվերի առաջադրանքը կարող է դեռ ավարտվել։",
+    uploadJob: "Բեռնում եմ աուդիոն։ ",
+    directJob: "Հերթը ժամանակավորապես հասանելի չէ։ Փոխարկում եմ ուղիղ։ ",
+    doneJob: "MIDI-ն պատրաստ է։ Ներբեռնեք կամ բացեք վարժարանում։",
+    queuedJob: "Ֆայլը հերթում է։ Սպասում ենք անվճար սերվերին...",
+    processingJob: "Ճանաչում եմ նոտաները և ստեղծում MIDI։ Էջը բաց պահեք։",
+    downloadingJob: "Փոխարկումն ավարտվեց։ Ստանում եմ MIDI-ն...",
+    preparingJob: "Պատրաստում եմ փոխարկումը...",
+    taskId: "Առաջադրանք",
+    estimatedWait: "Մոտավոր սպասում",
+    approxRemaining: "Մոտավորապես մնացել է",
+    roughRemaining: "Կոպիտ գնահատում",
+    takingLonger: "Սովորականից երկար է տևում։ Անվճար սերվերը կարող է դեռ աշխատել։",
+    idleBadge: "Սպասում",
+    uploadingBadge: "Բեռնում",
+    queuedBadge: "Հերթում",
+    processingBadge: "Աշխատում է",
+    downloadingBadge: "Ստանում է",
+    readyBadge: "Պատրաստ",
+    failedBadge: "Սխալ",
+    stoppedBadge: "Դադարեցված",
+    workingBadge: "Աշխատում է",
   },
   de: {
     chooseFile: "Waehle eine Audiodatei.",
@@ -78,7 +146,11 @@ const copy = {
     converting: "Konvertierung...",
     backendReady: "Konvertierungsdienst ist erreichbar. Audio kann konvertiert werden.",
     backendError: "Konvertierungsdienst antwortet nicht.",
-    fileTooLarge: (limit) => `Die Datei ist fuer dieses MVP zu gross. Limit: ${limit} MB.`,
+    fileTooLarge: (limit) => `Die Datei ist zu gross. Maximum: ${limit} MB.`,
+    fileTooLong: (limit) => `Das Audio ist fuer die Beta zu lang. Maximum: ${limit} Sekunden.`,
+    unsupportedFile: "Dieses Format wird wahrscheinlich nicht unterstuetzt. Versuche MP3, WAV, OGG, FLAC oder M4A.",
+    conversionFailed: "Noten konnten nicht erkannt werden. Versuche eine kurze, saubere Aufnahme eines Instruments.",
+    serviceUnavailable: "Der Konvertierungsdienst ist gerade nicht erreichbar. Versuche es in einer Minute erneut.",
     fileSelected: (name) => `Datei gewaehlt: ${name}`,
     sending: "Audio wird fuer die Konvertierung hochgeladen...",
     backendStatus: (status) => `Konvertierungsdienst meldet Fehler ${status}.`,
@@ -97,6 +169,36 @@ const copy = {
     sensitiveMode: "Leise oder verrauschte Aufnahme",
     modeHelp:
       "Normale Aufnahme passt meistens. Der Modus fuer verrauschte Audios kann helfen, kann saubere Aufnahmen aber verschlechtern.",
+    conversionTask: "Konvertierungsaufgabe",
+    uploadStep: "Upload",
+    queueStep: "Warteschlange",
+    convertStep: "Erkennung",
+    readyStep: "Fertig",
+    stopWaiting: "Warten stoppen",
+    tryAgain: "Erneut versuchen",
+    stoppedStatus: "Warten gestoppt. Du kannst eine neue Konvertierung starten.",
+    stoppedJob: "Warten wurde in diesem Browser gestoppt. Die Serveraufgabe kann noch fertig werden.",
+    uploadJob: "Audio wird hochgeladen. ",
+    directJob: "Warteschlange ist gerade nicht verfuegbar. Direkte Konvertierung. ",
+    doneJob: "MIDI ist fertig. Lade es herunter oder oeffne es im Trainer.",
+    queuedJob: "Datei ist in der Warteschlange. Kostenloser Server wird frei...",
+    processingJob: "Noten werden erkannt und MIDI wird erstellt. Lass die Seite offen.",
+    downloadingJob: "Konvertierung fertig. MIDI wird geladen...",
+    preparingJob: "Konvertierung wird vorbereitet...",
+    taskId: "Aufgabe",
+    estimatedWait: "Geschaetzte Wartezeit",
+    approxRemaining: "Ungefaehr verbleibend",
+    roughRemaining: "Grobe Schaetzung",
+    takingLonger: "Dauert laenger als ueblich. Der kostenlose Server arbeitet vielleicht noch.",
+    idleBadge: "Bereit",
+    uploadingBadge: "Upload",
+    queuedBadge: "Wartet",
+    processingBadge: "Arbeitet",
+    downloadingBadge: "Laedt",
+    readyBadge: "Fertig",
+    failedBadge: "Fehler",
+    stoppedBadge: "Gestoppt",
+    workingBadge: "Arbeitet",
   },
   es: {
     chooseFile: "Elige un archivo de audio.",
@@ -107,7 +209,11 @@ const copy = {
     converting: "Convirtiendo...",
     backendReady: "El servicio de conversion esta disponible. Puedes convertir el audio.",
     backendError: "El servicio de conversion no responde.",
-    fileTooLarge: (limit) => `El archivo es demasiado grande para este MVP. Limite: ${limit} MB.`,
+    fileTooLarge: (limit) => `El archivo es demasiado grande. Maximo: ${limit} MB.`,
+    fileTooLong: (limit) => `El audio es demasiado largo para la beta. Maximo: ${limit} segundos.`,
+    unsupportedFile: "Parece que este formato no es compatible. Prueba MP3, WAV, OGG, FLAC o M4A.",
+    conversionFailed: "No se pudieron reconocer las notas. Prueba una grabacion corta y limpia de un solo instrumento.",
+    serviceUnavailable: "El servicio de conversion no esta disponible ahora. Intentalo de nuevo en un minuto.",
     fileSelected: (name) => `Archivo elegido: ${name}`,
     sending: "Subiendo audio para convertirlo...",
     backendStatus: (status) => `El servicio de conversion devolvio el error ${status}.`,
@@ -127,6 +233,36 @@ const copy = {
     sensitiveMode: "Grabacion baja o con ruido",
     modeHelp:
       "Grabacion normal funciona mejor la mayoria de las veces. El modo para ruido puede ayudar con audios malos, pero puede empeorar grabaciones limpias.",
+    conversionTask: "Tarea de conversion",
+    uploadStep: "Subida",
+    queueStep: "Cola",
+    convertStep: "Deteccion",
+    readyStep: "Listo",
+    stopWaiting: "Dejar de esperar",
+    tryAgain: "Intentar otra vez",
+    stoppedStatus: "Espera detenida. Puedes iniciar una nueva conversion.",
+    stoppedJob: "La espera se detuvo en este navegador. La tarea del servidor puede terminar despues.",
+    uploadJob: "Subiendo audio. ",
+    directJob: "La cola no esta disponible ahora. Convirtiendo directamente. ",
+    doneJob: "MIDI listo. Descargalo o abrelo en el entrenador.",
+    queuedJob: "Archivo en cola. Esperando el servidor gratuito...",
+    processingJob: "Detectando notas y creando MIDI. Mantén esta pagina abierta.",
+    downloadingJob: "Conversion terminada. Descargando MIDI...",
+    preparingJob: "Preparando conversion...",
+    taskId: "Tarea",
+    estimatedWait: "Espera estimada",
+    approxRemaining: "Aprox restante",
+    roughRemaining: "Estimacion aproximada",
+    takingLonger: "Tarda mas de lo normal. El servidor gratuito puede seguir trabajando.",
+    idleBadge: "Espera",
+    uploadingBadge: "Subiendo",
+    queuedBadge: "En cola",
+    processingBadge: "Procesando",
+    downloadingBadge: "Descargando",
+    readyBadge: "Listo",
+    failedBadge: "Error",
+    stoppedBadge: "Detenido",
+    workingBadge: "Trabajando",
   },
   en: {
     chooseFile: "Choose an audio file.",
@@ -137,7 +273,11 @@ const copy = {
     converting: "Converting...",
     backendReady: "Conversion service is reachable. You can convert audio now.",
     backendError: "Conversion service is not responding.",
-    fileTooLarge: (limit) => `The file is too large for this MVP. Limit: ${limit} MB.`,
+    fileTooLarge: (limit) => `The file is too large. Maximum: ${limit} MB.`,
+    fileTooLong: (limit) => `The audio is too long for the beta. Maximum: ${limit} seconds.`,
+    unsupportedFile: "This format does not look supported. Try MP3, WAV, OGG, FLAC, or M4A.",
+    conversionFailed: "Could not recognize the notes. Try a short clean recording of one instrument.",
+    serviceUnavailable: "The conversion service is unavailable right now. Try again in a minute.",
     fileSelected: (name) => `File selected: ${name}`,
     sending: "Uploading audio for conversion...",
     backendStatus: (status) => `Conversion service returned error ${status}.`,
@@ -157,6 +297,36 @@ const copy = {
     sensitiveMode: "Quiet or noisy recording",
     modeHelp:
       "Normal recording is safest. The noisy-audio mode can help rough files, but may hurt clean recordings.",
+    conversionTask: "Conversion task",
+    uploadStep: "Upload",
+    queueStep: "Queue",
+    convertStep: "Detect",
+    readyStep: "Ready",
+    stopWaiting: "Stop waiting",
+    tryAgain: "Try again",
+    stoppedStatus: "Stopped waiting. You can start a new conversion when ready.",
+    stoppedJob: "Stopped waiting in this browser. The server task may still finish in the background.",
+    uploadJob: "Uploading your audio. ",
+    directJob: "Conversion queue is not available yet. Converting directly. ",
+    doneJob: "MIDI is ready. Download it or open it in the trainer.",
+    queuedJob: "Task is queued. Waiting for the free server...",
+    processingJob: "Detecting notes and creating MIDI. Keep this page open.",
+    downloadingJob: "Conversion finished. Downloading MIDI...",
+    preparingJob: "Preparing conversion...",
+    taskId: "Task",
+    estimatedWait: "Estimated wait",
+    approxRemaining: "Approx remaining",
+    roughRemaining: "Rough remaining",
+    takingLonger: "Taking longer than usual. The free server may still be working.",
+    idleBadge: "Idle",
+    uploadingBadge: "Uploading",
+    queuedBadge: "Queued",
+    processingBadge: "Processing",
+    downloadingBadge: "Downloading",
+    readyBadge: "Ready",
+    failedBadge: "Failed",
+    stoppedBadge: "Stopped",
+    workingBadge: "Working",
   },
 };
 
@@ -248,6 +418,9 @@ elements.file.addEventListener("change", () => {
   if (!selectedFile) {
     setSelectedFile(null);
     setStatus(text.chooseFile);
+  } else if (!isSupportedAudioFile(selectedFile)) {
+    setSelectedFile(selectedFile);
+    setStatus(text.unsupportedFile);
   } else if (selectedFile.size > MAX_AUDIO_MB * 1024 * 1024) {
     setSelectedFile(selectedFile);
     setStatus(text.fileTooLarge(MAX_AUDIO_MB));
@@ -264,6 +437,13 @@ elements.file.addEventListener("change", () => {
 elements.convert.addEventListener("click", async () => {
   if (!selectedFile) return;
 
+  const validationMessage = validateSelectedFile();
+  if (validationMessage) {
+    setStatus(validationMessage);
+    updateConvertState();
+    return;
+  }
+
   const backendUrl = getBackendUrl();
   if (!backendUrl) {
     setStatus(text.backendRequired);
@@ -277,7 +457,7 @@ elements.convert.addEventListener("click", async () => {
     setProgress(8);
     updateJobPanel({
       status: "uploading",
-      message: `Uploading your audio for conversion. ${formatEstimateMessage()}`,
+      message: `${text.uploadJob || copy.en.uploadJob}${formatEstimateMessage()}`,
       progress: 8,
       jobId: "",
       canStop: true,
@@ -292,7 +472,7 @@ elements.convert.addEventListener("click", async () => {
     } else {
       updateJobPanel({
         status: "processing",
-        message: `Conversion queue is not available yet. Converting directly. ${formatEstimateMessage()}`,
+        message: `${text.directJob || copy.en.directJob}${formatEstimateMessage()}`,
         progress: 30,
         canStop: true,
       });
@@ -303,7 +483,7 @@ elements.convert.addEventListener("click", async () => {
 
       if (!response.ok) {
         const message = await readErrorMessage(response);
-        throw new Error(message || text.backendStatus(response.status));
+        throw new Error(friendlyErrorMessage(message, response.status));
       }
 
       await storeMidiResponse(response);
@@ -313,7 +493,7 @@ elements.convert.addEventListener("click", async () => {
     setStatus(text.ready);
     updateJobPanel({
       status: "done",
-      message: "MIDI is ready. Download it or open it in the trainer.",
+      message: text.doneJob || copy.en.doneJob,
       progress: 100,
       canStop: false,
       canRetry: false,
@@ -322,10 +502,10 @@ elements.convert.addEventListener("click", async () => {
     console.error(error);
     if (error.message === STOPPED_WAITING_MESSAGE) {
       setProgress(0);
-      setStatus("Stopped waiting. You can start a new conversion when ready.");
+      setStatus(text.stoppedStatus || copy.en.stoppedStatus);
       updateJobPanel({
         status: "stopped",
-        message: "Stopped waiting in this browser. The conversion task may still finish in the background.",
+        message: text.stoppedJob || copy.en.stoppedJob,
         progress: 0,
         canStop: false,
         canRetry: Boolean(selectedFile),
@@ -333,10 +513,10 @@ elements.convert.addEventListener("click", async () => {
       return;
     }
     setProgress(0);
-    setStatus(error.message || text.failed);
+    setStatus(friendlyErrorMessage(error.message));
     updateJobPanel({
       status: "failed",
-      message: error.message || text.failed,
+      message: friendlyErrorMessage(error.message),
       progress: 0,
       canStop: false,
       canRetry: Boolean(selectedFile),
@@ -367,7 +547,7 @@ elements.openTrainer.addEventListener("click", () => {
 
 function updateConvertState() {
   const hasBackend = Boolean(getBackendUrl());
-  const hasValidFile = selectedFile && selectedFile.size <= MAX_AUDIO_MB * 1024 * 1024;
+  const hasValidFile = selectedFile && !validateSelectedFile();
   elements.convert.disabled = !hasBackend || !hasValidFile;
   if (elements.checkBackend) elements.checkBackend.disabled = !hasBackend;
 }
@@ -396,6 +576,10 @@ function resetResult() {
 
 function showEngineName(engine, preprocess) {
   let engineElement = document.querySelector("#generatedEngineName");
+  if (!isAdvancedBackendMode) {
+    engineElement?.closest(".generated-engine")?.remove();
+    return;
+  }
   if (!engineElement) {
     const container = document.createElement("div");
     container.className = "generated-engine";
@@ -411,7 +595,7 @@ function showEngineName(engine, preprocess) {
 }
 
 function setBusy(isBusy, checkLabel = text.checkBackend, convertLabel = text.converting) {
-  const hasValidFile = selectedFile && selectedFile.size <= MAX_AUDIO_MB * 1024 * 1024;
+  const hasValidFile = selectedFile && !validateSelectedFile();
   if (elements.backendUrl) elements.backendUrl.disabled = isBusy || !isAdvancedBackendMode;
   elements.file.disabled = isBusy;
   if (elements.quality) elements.quality.disabled = isBusy;
@@ -514,7 +698,7 @@ async function createQueuedJob(backendUrl) {
 
   if (!response.ok) {
     const message = await readErrorMessage(response);
-    throw new Error(message || text.backendStatus(response.status));
+    throw new Error(friendlyErrorMessage(message, response.status));
   }
 
   const job = await response.json();
@@ -539,14 +723,14 @@ async function waitForQueuedMidi(backendUrl, initialJob, runId) {
     }
 
     if (job.status === "failed") {
-      throw new Error(job.error || job.message || text.failed);
+      throw new Error(friendlyErrorMessage(job.error || job.message || text.failed));
     }
 
     await sleep(JOB_POLL_MS);
     const response = await fetch(`${backendUrl}/jobs/${encodeURIComponent(job.job_id)}`);
     if (!response.ok) {
       const message = await readErrorMessage(response);
-      throw new Error(message || text.backendStatus(response.status));
+      throw new Error(friendlyErrorMessage(message, response.status));
     }
 
     job = await response.json();
@@ -565,7 +749,7 @@ async function waitForQueuedMidi(backendUrl, initialJob, runId) {
   setStatus(text.receiving);
   updateJobPanel({
     status: "downloading",
-    message: "Conversion finished. Downloading MIDI...",
+    message: text.downloadingJob || copy.en.downloadingJob,
     progress: 88,
     jobId: job.job_id,
     canStop: true,
@@ -574,7 +758,7 @@ async function waitForQueuedMidi(backendUrl, initialJob, runId) {
   const midiResponse = await fetch(`${backendUrl}/jobs/${encodeURIComponent(job.job_id)}/midi`);
   if (!midiResponse.ok) {
     const message = await readErrorMessage(midiResponse);
-    throw new Error(message || text.backendStatus(midiResponse.status));
+    throw new Error(friendlyErrorMessage(message, midiResponse.status));
   }
 
   await storeMidiResponse(midiResponse);
@@ -595,11 +779,11 @@ async function storeMidiResponse(response) {
 
 function formatJobStatus(job) {
   const status = job?.status || "queued";
-  if (status === "queued") return "Task is queued. Waiting for the free server...";
-  if (status === "processing") return "Converting audio to MIDI. You can keep this page open.";
-  if (status === "done") return "Conversion finished. Downloading MIDI...";
-  if (status === "failed") return job.error || "Conversion failed.";
-  return job.message || "Preparing conversion...";
+  if (status === "queued") return text.queuedJob || copy.en.queuedJob;
+  if (status === "processing") return text.processingJob || copy.en.processingJob;
+  if (status === "done") return text.downloadingJob || copy.en.downloadingJob;
+  if (status === "failed") return friendlyErrorMessage(job.error || job.message || text.failed);
+  return job.message || text.preparingJob || copy.en.preparingJob;
 }
 
 function ensureJobPanel() {
@@ -614,10 +798,10 @@ function ensureJobPanel() {
 
   const badge = document.createElement("span");
   badge.className = "job-status-badge";
-  badge.textContent = "Idle";
+  badge.textContent = text.idleBadge || copy.en.idleBadge;
 
   const title = document.createElement("strong");
-  title.textContent = "Conversion task";
+  title.textContent = text.conversionTask || copy.en.conversionTask;
 
   const elapsed = document.createElement("small");
   elapsed.className = "job-elapsed";
@@ -628,10 +812,10 @@ function ensureJobPanel() {
   const steps = document.createElement("ol");
   steps.className = "job-steps";
   for (const [step, label] of [
-    ["uploading", "Upload"],
-    ["queued", "Queue"],
-    ["processing", "Convert"],
-    ["done", "Ready"],
+    ["uploading", text.uploadStep || copy.en.uploadStep],
+    ["queued", text.queueStep || copy.en.queueStep],
+    ["processing", text.convertStep || copy.en.convertStep],
+    ["done", text.readyStep || copy.en.readyStep],
   ]) {
     const item = document.createElement("li");
     item.dataset.step = step;
@@ -654,15 +838,15 @@ function ensureJobPanel() {
   const stopButton = document.createElement("button");
   stopButton.type = "button";
   stopButton.className = "secondary";
-  stopButton.textContent = "Stop waiting";
+  stopButton.textContent = text.stopWaiting || copy.en.stopWaiting;
   stopButton.addEventListener("click", () => {
     activeRunId += 1;
     stopConversionTimer();
     setBusy(false);
-    setStatus("Stopped waiting. You can start a new conversion when ready.");
+    setStatus(text.stoppedStatus || copy.en.stoppedStatus);
     updateJobPanel({
       status: "stopped",
-      message: "Stopped waiting in this browser. The conversion task may still finish in the background.",
+      message: text.stoppedJob || copy.en.stoppedJob,
       canStop: false,
       canRetry: Boolean(selectedFile),
     });
@@ -670,7 +854,7 @@ function ensureJobPanel() {
 
   const retryButton = document.createElement("button");
   retryButton.type = "button";
-  retryButton.textContent = "Try again";
+  retryButton.textContent = text.tryAgain || copy.en.tryAgain;
   retryButton.addEventListener("click", () => {
     if (!selectedFile || elements.convert.disabled) return;
     elements.convert.click();
@@ -692,7 +876,7 @@ function updateJobPanel({ status, message, progress, jobId, canStop = false, can
   if (jobId) activeJobId = jobId;
   jobPanel.badge.textContent = labelForJobStatus(status);
   jobPanel.message.textContent = message || "";
-  jobPanel.meta.textContent = activeJobId ? `Task ID: ${shortJobId(activeJobId)}` : "";
+  jobPanel.meta.textContent = activeJobId ? `${text.taskId || copy.en.taskId}: ${shortJobId(activeJobId)}` : "";
   jobPanel.estimate.textContent = formatEstimateMeta(status);
   jobPanel.stopButton.hidden = !canStop;
   jobPanel.retryButton.hidden = !canRetry;
@@ -727,14 +911,14 @@ function updateJobElapsed(value) {
 }
 
 function labelForJobStatus(status) {
-  if (status === "uploading") return "Uploading";
-  if (status === "queued") return "Queued";
-  if (status === "processing") return "Processing";
-  if (status === "downloading") return "Downloading";
-  if (status === "done") return "Ready";
-  if (status === "failed") return "Failed";
-  if (status === "stopped") return "Stopped";
-  return "Working";
+  if (status === "uploading") return text.uploadingBadge || copy.en.uploadingBadge;
+  if (status === "queued") return text.queuedBadge || copy.en.queuedBadge;
+  if (status === "processing") return text.processingBadge || copy.en.processingBadge;
+  if (status === "downloading") return text.downloadingBadge || copy.en.downloadingBadge;
+  if (status === "done") return text.readyBadge || copy.en.readyBadge;
+  if (status === "failed") return text.failedBadge || copy.en.failedBadge;
+  if (status === "stopped") return text.stoppedBadge || copy.en.stoppedBadge;
+  return text.workingBadge || copy.en.workingBadge;
 }
 
 function stepIndexForStatus(status) {
@@ -767,9 +951,24 @@ function estimateAudioDurationFromSize(file) {
   return Math.min(MAX_AUDIO_SECONDS, Math.max(5, file.size / bytesPerSecond));
 }
 
+function validateSelectedFile() {
+  if (!selectedFile) return text.chooseFile;
+  if (!isSupportedAudioFile(selectedFile)) return text.unsupportedFile;
+  if (selectedFile.size > MAX_AUDIO_MB * 1024 * 1024) return text.fileTooLarge(MAX_AUDIO_MB);
+  if (selectedAudioDuration > MAX_AUDIO_SECONDS) return text.fileTooLong(MAX_AUDIO_SECONDS);
+  return "";
+}
+
+function isSupportedAudioFile(file) {
+  const name = file?.name?.toLowerCase() || "";
+  const type = file?.type?.toLowerCase() || "";
+  if (type.startsWith("audio/")) return true;
+  return [".mp3", ".wav", ".ogg", ".flac", ".m4a"].some((extension) => name.endsWith(extension));
+}
+
 function formatEstimateMessage() {
   if (!activeEstimate) return "";
-  return `Estimated wait: about ${formatDurationRange(activeEstimate.lower, activeEstimate.upper)}.`;
+  return `${text.estimatedWait || copy.en.estimatedWait}: ${formatDurationRange(activeEstimate.lower, activeEstimate.upper)}.`;
 }
 
 function formatEstimateMeta(status) {
@@ -778,9 +977,9 @@ function formatEstimateMeta(status) {
   const remainingLower = Math.max(0, activeEstimate.lower - elapsedSeconds);
   const remainingUpper = Math.max(0, activeEstimate.upper - elapsedSeconds);
   if (remainingUpper === 0) {
-    return "Taking longer than usual. The free server may still be working.";
+    return text.takingLonger || copy.en.takingLonger;
   }
-  const prefix = activeEstimate.source === "duration" ? "Approx remaining" : "Rough remaining";
+  const prefix = activeEstimate.source === "duration" ? text.approxRemaining || copy.en.approxRemaining : text.roughRemaining || copy.en.roughRemaining;
   return `${prefix}: ${formatDurationRange(remainingLower, remainingUpper)}`;
 }
 
@@ -823,6 +1022,10 @@ function loadSelectedAudioDuration(file) {
     URL.revokeObjectURL(url);
     if (selectedFile === file && selectedAudioDuration > 0) {
       elements.selectedFileMeta.textContent = `${formatBytes(file.size)} - ${formatElapsed(selectedAudioDuration * 1000)} audio`;
+      if (selectedAudioDuration > MAX_AUDIO_SECONDS) {
+        setStatus(text.fileTooLong(MAX_AUDIO_SECONDS));
+      }
+      updateConvertState();
     }
   });
 
@@ -879,6 +1082,51 @@ async function readErrorMessage(response) {
     return data?.detail || data?.message || "";
   }
   return response.text().catch(() => "");
+}
+
+function friendlyErrorMessage(message = "", status = 0) {
+  const raw = String(message || "").trim();
+  const lower = raw.toLowerCase();
+
+  if (
+    raw === text.fileTooLarge(MAX_AUDIO_MB) ||
+    raw === text.fileTooLong(MAX_AUDIO_SECONDS) ||
+    raw === text.unsupportedFile ||
+    raw === text.serviceUnavailable ||
+    raw === text.sleeping ||
+    raw === text.conversionFailed
+  ) {
+    return raw;
+  }
+
+  if (status === 413 || lower.includes("too large") || lower.includes("file size")) {
+    return text.fileTooLarge(MAX_AUDIO_MB);
+  }
+
+  if (status === 415 || lower.includes("unsupported") || lower.includes("format") || lower.includes("codec")) {
+    return text.unsupportedFile;
+  }
+
+  if (lower.includes("duration") || lower.includes("too long") || lower.includes("60 seconds")) {
+    return text.fileTooLong(MAX_AUDIO_SECONDS);
+  }
+
+  if (
+    status === 429 ||
+    status === 502 ||
+    status === 503 ||
+    status === 504 ||
+    lower.includes("failed to fetch") ||
+    lower.includes("network") ||
+    lower.includes("timeout") ||
+    lower.includes("sleep")
+  ) {
+    return text.serviceUnavailable || text.sleeping;
+  }
+
+  if (!raw || raw === text.failed) return text.conversionFailed || text.failed;
+
+  return text.conversionFailed || raw;
 }
 
 function arrayToBase64(bytes) {

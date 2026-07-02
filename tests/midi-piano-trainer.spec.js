@@ -224,6 +224,62 @@ test("opens the public audio-to-midi page with automatic conversion service", as
   expect(errors).toEqual([]);
 });
 
+test("shows friendly audio validation errors before conversion", async ({ page }) => {
+  await page.goto("/ru/audio-to-midi/");
+
+  await expect(page.getByText("Работает лучше")).toBeVisible();
+  await expect(page.getByText("Может ошибаться")).toBeVisible();
+
+  await page.locator("#audioFile").setInputFiles({
+    name: "notes.txt",
+    mimeType: "text/plain",
+    buffer: Buffer.from("not audio"),
+  });
+  await expect(page.locator("#convertAudioButton")).toBeDisabled();
+  await expect(page.locator("#conversionStatus")).toContainText("формат");
+
+  await page.locator("#audioFile").evaluate((input) => {
+    const file = new File(["x"], "huge.wav", { type: "audio/wav" });
+    Object.defineProperty(file, "size", { value: 26 * 1024 * 1024 });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    input.files = dataTransfer.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await expect(page.locator("#convertAudioButton")).toBeDisabled();
+  await expect(page.locator("#conversionStatus")).toContainText("слишком большой");
+
+  await page.locator("#audioFile").setInputFiles({
+    name: "long.wav",
+    mimeType: "audio/wav",
+    buffer: createWavFile(61),
+  });
+  await expect(page.locator("#conversionStatus")).toContainText("слишком длинное", { timeout: 8000 });
+  await expect(page.locator("#convertAudioButton")).toBeDisabled();
+});
+
+test("shows a friendly service error when conversion cannot start", async ({ page }) => {
+  await page.route(`${DEFAULT_BACKEND_URL}/jobs`, async (route) => {
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({ detail: "worker timeout: backend unavailable" }),
+    });
+  });
+
+  await page.goto("/ru/audio-to-midi/");
+  await page.locator("#audioFile").setInputFiles({
+    name: "test-tone.wav",
+    mimeType: "audio/wav",
+    buffer: createWavFile(),
+  });
+
+  await page.locator("#convertAudioButton").click();
+  await expect(page.locator("#conversionStatus")).toContainText("недоступен");
+  await expect(page.locator(".job-panel")).toContainText("Ошибка");
+  await expect(page.locator(".job-panel")).not.toContainText("worker timeout");
+});
+
 test("converts audio through backend and opens the generated MIDI in the trainer", async ({ page }) => {
   const midi = createMidiFile([60, 64, 67]);
   let jobBody = "";
@@ -295,10 +351,10 @@ test("converts audio through backend and opens the generated MIDI in the trainer
   expect(jobBody).toContain('name="quality"');
   expect(jobBody).toContain("balanced");
   await expect(page.locator(".job-panel")).toBeVisible();
-  await expect(page.locator(".job-estimate")).toContainText(/remaining/i);
+  await expect(page.locator(".job-estimate")).toContainText(/Осталось|remaining/i);
   await expect(page.locator(".job-meta")).toContainText("job-1");
-  await expect(page.locator(".job-steps")).toContainText("Upload");
-  await expect(page.locator(".job-steps")).toContainText("Ready");
+  await expect(page.locator(".job-steps")).toContainText("Загрузка");
+  await expect(page.locator(".job-steps")).toContainText("Готово");
   await expect(page.locator("#conversionStatus")).toContainText("MIDI готов");
   await expect(page.locator("#generatedFileName")).toHaveText("test-tone.mid");
   await expect(page.locator("#generatedNoteCount")).toHaveText("3");
@@ -448,9 +504,8 @@ function varLength(value) {
   return bytes;
 }
 
-function createWavFile() {
+function createWavFile(durationSeconds = 0.2) {
   const sampleRate = 8000;
-  const durationSeconds = 0.2;
   const sampleCount = Math.floor(sampleRate * durationSeconds);
   const dataSize = sampleCount * 2;
   const buffer = Buffer.alloc(44 + dataSize);
