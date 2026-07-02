@@ -423,9 +423,14 @@ export function applyLanguage(language) {
 export function languageUrl(language) {
   const lang = LANGUAGES.includes(language) ? language : "ru";
   const parts = window.location.pathname.split("/").filter(Boolean);
-  const hasRepoPath = parts.includes("midi-piano-trainer");
+  const repoIndex = parts.indexOf("midi-piano-trainer");
+  const hasRepoPath = repoIndex !== -1;
+  const routeParts = hasRepoPath ? parts.slice(repoIndex + 1) : parts;
+  const currentLangIndex = routeParts.findIndex((part) => LANGUAGES.includes(part));
+  const pageParts = currentLangIndex === -1 ? routeParts : routeParts.slice(currentLangIndex + 1);
   const base = hasRepoPath ? "/midi-piano-trainer/" : "/";
-  return `${base}${lang}/`;
+  const pagePath = pageParts.length ? `${pageParts.join("/")}/` : "";
+  return `${base}${lang}/${pagePath}${window.location.search}${window.location.hash}`;
 }
 
 export function t(language, key) {

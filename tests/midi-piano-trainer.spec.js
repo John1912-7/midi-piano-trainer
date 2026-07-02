@@ -48,6 +48,51 @@ test("localized public pages do not contain mojibake text", async () => {
   }
 });
 
+test("public pages expose language-only SEO alternates", async () => {
+  const pages = [
+    "index.html",
+    "ru/index.html",
+    "en/index.html",
+    "de/index.html",
+    "es/index.html",
+    "hy/index.html",
+    "ru/audio-to-midi/index.html",
+    "en/audio-to-midi/index.html",
+    "de/audio-to-midi/index.html",
+    "es/audio-to-midi/index.html",
+    "hy/audio-to-midi/index.html",
+  ];
+  const languages = ["en", "ru", "de", "es", "hy"];
+
+  for (const file of pages) {
+    const html = readFileSync(resolve(file), "utf8");
+    expect(html, `${file} has canonical`).toMatch(/<link rel="canonical" href="https:\/\/john1912-7\.github\.io\/midi-piano-trainer\//);
+    expect(html, `${file} has x-default`).toContain('hreflang="x-default"');
+    for (const language of languages) {
+      expect(html, `${file} has ${language} hreflang`).toContain(`hreflang="${language}"`);
+    }
+    for (const bad of ["ru-RU", "de-DE", "es-ES", "hy-AM"]) {
+      expect(html, `${file} avoids ${bad}`).not.toContain(`hreflang="${bad}"`);
+    }
+  }
+
+  const sitemap = readFileSync(resolve("sitemap.xml"), "utf8");
+  for (const language of languages) {
+    expect(sitemap).toContain(`/midi-piano-trainer/${language}/`);
+    expect(sitemap).toContain(`/midi-piano-trainer/${language}/audio-to-midi/`);
+  }
+});
+
+test("language switch keeps the current public page", async ({ page }) => {
+  await page.goto("/ru/?generatedMidi=1#trainer-workspace");
+  await page.locator("#languageSelect").selectOption("de");
+  await expect(page).toHaveURL(/\/de\/\?generatedMidi=1#trainer-workspace$/);
+
+  await page.goto("/ru/audio-to-midi/?advanced=1#convert");
+  await page.locator("#audioLanguageSelect").selectOption("en");
+  await expect(page).toHaveURL(/\/en\/audio-to-midi\/\?advanced=1#convert$/);
+});
+
 test("loads a MIDI file and aligns falling notes with keyboard lanes", async ({ page }) => {
   const consoleErrors = [];
   page.on("console", (message) => {

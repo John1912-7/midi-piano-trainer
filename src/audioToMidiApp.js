@@ -1162,5 +1162,5 @@ function languageAudioUrl(lang) {
   const parts = window.location.pathname.split("/").filter(Boolean);
   const hasRepoPath = parts.includes("midi-piano-trainer");
   const base = hasRepoPath ? "/midi-piano-trainer/" : "/";
-  return `${base}${target}/audio-to-midi/`;
+  return `${base}${target}/audio-to-midi/${window.location.search}${window.location.hash}`;
 }
